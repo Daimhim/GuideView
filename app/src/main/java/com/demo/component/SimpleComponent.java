@@ -38,4 +38,9 @@ public class SimpleComponent implements Component {
   @Override public int getYOffset() {
     return 10;
   }
+
+  @Override
+  public int getAnchorId() {
+    return 0;
+  }
 }

@@ -53,4 +53,9 @@ public class MutiComponent implements Component {
   @Override public int getYOffset() {
     return 20;
   }
+
+  @Override
+  public int getAnchorId() {
+    return 0;
+  }
 }

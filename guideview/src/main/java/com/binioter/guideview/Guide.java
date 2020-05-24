@@ -1,13 +1,21 @@
 package com.binioter.guideview;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.util.SparseArray;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+
 
 /**
  * 遮罩系统的封装 <br>
@@ -20,19 +28,19 @@ import android.view.animation.AnimationUtils;
 public class Guide implements View.OnKeyListener, View.OnTouchListener {
 
     Guide() {
+
     }
 
     /**
      * 滑动临界值
      */
     private static final int SLIDE_THRESHOLD = 30;
-    private Configuration mConfiguration;
-    private MaskView mMaskView;
-    private Component[] mComponents;
-    // 根据locInwindow定位后，是否需要判断loc值非0
-    private boolean mShouldCheckLocInWindow = true;
-    private GuideBuilder.OnVisibilityChangedListener mOnVisibilityChangedListener;
-    private GuideBuilder.OnSlideListener mOnSlideListener;
+    protected Configuration mConfiguration;
+    protected MaskView mMaskView;
+    protected Component[] mComponents;
+    protected SparseArray<HighlightArea> mHighlightAreas;
+    protected GuideBuilder.OnVisibilityChangedListener mOnVisibilityChangedListener;
+    protected GuideBuilder.OnSlideListener mOnSlideListener;
 
     void setConfiguration(Configuration configuration) {
         mConfiguration = configuration;
@@ -40,6 +48,10 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
 
     void setComponents(Component[] components) {
         mComponents = components;
+    }
+
+    void setTargetViews(SparseArray<HighlightArea> highlightAreas) {
+        mHighlightAreas = highlightAreas;
     }
 
     void setCallback(GuideBuilder.OnVisibilityChangedListener listener) {
@@ -56,9 +68,16 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
      * @param activity 目标Activity
      */
     public void show(Activity activity) {
-        show(activity, null);
+        show(activity, (ViewGroup) activity.getWindow().getDecorView());
     }
-
+    /**
+     * 显示遮罩
+     *
+     * @param dialog 目标Activity
+     */
+    public void show(Dialog dialog) {
+        show(dialog.getContext(),dialog.getWindow(), (ViewGroup) dialog.getWindow().getDecorView());
+    }
     /**
      * 显示遮罩
      *
@@ -66,38 +85,34 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
      * @param overlay  遮罩层view
      */
     public void show(Activity activity, ViewGroup overlay) {
-        mMaskView = onCreateView(activity, overlay);
-        if (overlay == null) {
-            overlay = (ViewGroup) activity.getWindow().getDecorView();
-        }
-        if (mMaskView.getParent() == null && mConfiguration.mTargetView != null) {
-            overlay.addView(mMaskView);
-            if (mConfiguration.mEnterAnimationId != -1) {
-                Animation anim = AnimationUtils.loadAnimation(activity, mConfiguration.mEnterAnimationId);
-                assert anim != null;
-                anim.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
+        show(activity,activity.getWindow(), overlay);
+    }
 
-                    }
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        if (mOnVisibilityChangedListener != null) {
-                            mOnVisibilityChangedListener.onShown();
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-                mMaskView.startAnimation(anim);
-            } else {
-                if (mOnVisibilityChangedListener != null) {
-                    mOnVisibilityChangedListener.onShown();
-                }
+    public void show(Context context,Window window,ViewGroup overlay){
+        mMaskView = onCreateView(context, overlay);
+        switch (mConfiguration.mShowMode){
+            case MaskView.VIEW_SHOW:{
+                overlay.addView(mMaskView);
+                break;
+            }
+            case MaskView.DIALOG_SHOW:{
+                Dialog lDialog = new Dialog(context);
+                lDialog.setContentView(mMaskView);
+                Window lWindow = lDialog.getWindow();
+                WindowManager.LayoutParams lAttributes = lWindow.getAttributes();
+                lAttributes.width = WindowManager.LayoutParams.MATCH_PARENT;
+                lAttributes.height = WindowManager.LayoutParams.MATCH_PARENT;
+                lWindow.setAttributes(lAttributes);
+                lWindow.getDecorView().setPadding(0,0,0,0);
+//                lWindow.getDecorView().setMinimumWidth((int) mMaskView.getMOverlayRect().right);
+//                lWindow.getDecorView().setMinimumHeight((int) mMaskView.getMOverlayRect().bottom);
+                lWindow.setBackgroundDrawableResource(android.R.color.transparent);
+                lDialog.show();
+                break;
+            }
+            case MaskView.DIALOG_FRAGMENT_SHOW:{
+                break;
             }
         }
     }
@@ -166,47 +181,16 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
      * 根据locInwindow定位后，是否需要判断loc值非0
      */
     public void setShouldCheckLocInWindow(boolean set) {
-        mShouldCheckLocInWindow = set;
+//        mShouldCheckLocInWindow = set;/**/
     }
 
-    private MaskView onCreateView(Activity activity, ViewGroup overlay) {
-        if (overlay == null) {
-            overlay = (ViewGroup) activity.getWindow().getDecorView();
-        }
-        MaskView maskView = new MaskView(activity);
-        maskView.setFullingColor(activity.getResources().getColor(mConfiguration.mFullingColorId));
-        maskView.setFullingAlpha(mConfiguration.mAlpha);
-        maskView.setHighTargetCorner(mConfiguration.mCorner);
-        maskView.setPadding(mConfiguration.mPadding);
-        maskView.setPaddingLeft(mConfiguration.mPaddingLeft);
-        maskView.setPaddingTop(mConfiguration.mPaddingTop);
-        maskView.setPaddingRight(mConfiguration.mPaddingRight);
-        maskView.setPaddingBottom(mConfiguration.mPaddingBottom);
-        maskView.setHighTargetGraphStyle(mConfiguration.mGraphStyle);
-        maskView.setOverlayTarget(mConfiguration.mOverlayTarget);
+    protected MaskView onCreateView(Context context, ViewGroup overlay) {
+        MaskView maskView = new MaskView(context);
+        maskView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         maskView.setOnKeyListener(this);
-
-        // For removing the height of status bar we need the root content view's
-        // location on screen
-        int parentX = 0;
-        int parentY = 0;
-        if (overlay != null) {
-            int[] loc = new int[2];
-            overlay.getLocationInWindow(loc);
-            parentX = loc[0];
-            parentY = loc[1];
-        }
-
-        if (mConfiguration.mTargetView != null) {
-            maskView.setTargetRect(Common.getViewAbsRect(mConfiguration.mTargetView, parentX, parentY));
-        } else {
-            // Gets the target view's abs rect
-            View target = activity.findViewById(mConfiguration.mTargetViewId);
-            if (target != null) {
-                maskView.setTargetRect(Common.getViewAbsRect(target, parentX, parentY));
-            }
-        }
-
+        maskView.setMTargetRects(mHighlightAreas);
+        maskView.setFullingColor(context.getResources().getColor(mConfiguration.mFullingColorId));
+        maskView.setFullingAlpha(mConfiguration.mAlpha);
         if (mConfiguration.mOutsideTouchable) {
             maskView.setClickable(false);
         } else {
@@ -215,7 +199,7 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
 
         // Adds the components to the mask view.
         for (Component c : mComponents) {
-            maskView.addView(Common.componentToView(activity.getLayoutInflater(), c));
+            maskView.addView(Common.componentToView(LayoutInflater.from(context), c));
         }
 
         return maskView;
@@ -247,6 +231,15 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
+        //处理焦点
+        if (mConfiguration.focusClick){
+            for (int i = 0; i < mHighlightAreas.size(); i++) {
+                if (isTouchPointInView(mHighlightAreas.valueAt(i).getView(),motionEvent.getRawX(),motionEvent.getRawY())){
+                    mHighlightAreas.valueAt(i).getView().dispatchTouchEvent(motionEvent);
+                }
+            }
+            return true;
+        }
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
             startY = motionEvent.getY();
         } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
@@ -264,5 +257,22 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
             }
         }
         return true;
+    }
+
+    private boolean isTouchPointInView(View targetView, float xAxis, float yAxis) {
+        if (targetView== null) {
+            return false;
+        }
+        int[] location = new int[2];
+        targetView.getLocationOnScreen(location);
+        int left = location[0];
+        int top = location[1];
+        int right = left + targetView.getMeasuredWidth();
+        int bottom = top + targetView.getMeasuredHeight();
+        if (yAxis >= top && yAxis <= bottom && xAxis >= left
+                && xAxis <= right) {
+            return true;
+        }
+        return false;
     }
 }

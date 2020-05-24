@@ -82,7 +82,7 @@ public class MyListActivity extends Activity {
     public void showGuideView(View targetView) {
       showTimes++;
       GuideBuilder builder = new GuideBuilder();
-      builder.setTargetView(targetView)
+      builder.addTargetView(targetView)
           .setAlpha(150)
           .setHighTargetCorner(20)
           .setHighTargetPadding(10)

@@ -20,12 +20,18 @@ import android.view.View;
 
 public interface Component {
 
+  /**
+   * 相对位置
+   */
   public final static int FIT_START = MaskView.LayoutParams.PARENT_START;
 
   public final static int FIT_END = MaskView.LayoutParams.PARENT_END;
 
   public final static int FIT_CENTER = MaskView.LayoutParams.PARENT_CENTER;
 
+  /**
+   * 高亮View为锚点
+   */
   public final static int ANCHOR_LEFT = MaskView.LayoutParams.ANCHOR_LEFT;
 
   public final static int ANCHOR_RIGHT = MaskView.LayoutParams.ANCHOR_RIGHT;
@@ -37,14 +43,10 @@ public interface Component {
   public final static int ANCHOR_OVER = MaskView.LayoutParams.ANCHOR_OVER;
 
   /**
-   * 圆角矩形&矩形
+   * 以父类View为锚点 位置使用 Gravity
    */
-  public final static int ROUNDRECT = 0;
+  public final static int ANCHOR_PARENT = MaskView.LayoutParams.ANCHOR_IN_PARENT;
 
-  /**
-   * 圆形
-   */
-  public final static int CIRCLE = 1;
 
   /**
    * 需要显示的view
@@ -83,4 +85,6 @@ public interface Component {
    * @return Y轴偏移量，单位 dp
    */
   int getYOffset();
+
+  int getAnchorId();
 }

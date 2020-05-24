@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.novoda.bintray-release'// 新增`
 
 android {
@@ -22,6 +24,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:support-annotations:24.2.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 }
 
@@ -39,4 +42,7 @@ publish {// 新增
 
     website = 'https://github.com/binIoter/GuideView'// 项目站点，可选项
 
+}
+repositories {
+    mavenCentral()
 }

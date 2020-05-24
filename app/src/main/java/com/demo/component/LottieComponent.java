@@ -39,4 +39,9 @@ public class LottieComponent implements Component {
   @Override public int getYOffset() {
     return -30;
   }
+
+  @Override
+  public int getAnchorId() {
+    return 0;
+  }
 }

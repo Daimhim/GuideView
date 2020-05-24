@@ -2,7 +2,6 @@ package com.binioter.guideview;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.view.View;
 
 /**
  * 遮罩系统创建时配置参数的封装 <br/>
@@ -10,12 +9,6 @@ import android.view.View;
  */
 
 class Configuration implements Parcelable {
-
-  /**
-   * 需要被找的View
-   */
-  View mTargetView = null;
-
   /**
    * 高亮区域的padding
    */
@@ -55,11 +48,6 @@ class Configuration implements Parcelable {
   int mFullingViewId = -1;
 
   /**
-   * 目标控件Id
-   */
-  int mTargetViewId = -1;
-
-  /**
    * 高亮区域的圆角大小
    */
   int mCorner = 0;
@@ -67,7 +55,7 @@ class Configuration implements Parcelable {
   /**
    * 高亮区域的图形样式，默认为矩形
    */
-  int mGraphStyle = Component.ROUNDRECT;
+  int mGraphStyle = MaskView.ROUNDRECT;
 
   /**
    * 遮罩背景颜色id
@@ -84,11 +72,18 @@ class Configuration implements Parcelable {
    */
   boolean mOverlayTarget = false;
 
+  /**
+   * 仅焦点可点击
+   */
+  boolean focusClick = false;
+
   boolean mShowCloseButton = false;
 
   int mEnterAnimationId = -1;
 
   int mExitAnimationId = -1;
+
+  int mShowMode = MaskView.VIEW_SHOW;
 
   @Override
   public int describeContents() {
@@ -99,7 +94,6 @@ class Configuration implements Parcelable {
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeInt(mAlpha);
     dest.writeInt(mFullingViewId);
-    dest.writeInt(mTargetViewId);
     dest.writeInt(mFullingColorId);
     dest.writeInt(mCorner);
     dest.writeInt(mPadding);
@@ -108,6 +102,7 @@ class Configuration implements Parcelable {
     dest.writeInt(mPaddingRight);
     dest.writeInt(mPaddingBottom);
     dest.writeInt(mGraphStyle);
+    dest.writeInt(mShowMode);
     dest.writeByte((byte) (mAutoDismiss ? 1 : 0));
     dest.writeByte((byte) (mOverlayTarget ? 1 : 0));
   }
@@ -118,7 +113,6 @@ class Configuration implements Parcelable {
       Configuration conf = new Configuration();
       conf.mAlpha = source.readInt();
       conf.mFullingViewId = source.readInt();
-      conf.mTargetViewId = source.readInt();
       conf.mFullingColorId = source.readInt();
       conf.mCorner = source.readInt();
       conf.mPadding = source.readInt();
@@ -127,6 +121,7 @@ class Configuration implements Parcelable {
       conf.mPaddingRight = source.readInt();
       conf.mPaddingBottom = source.readInt();
       conf.mGraphStyle = source.readInt();
+      conf.mShowMode = source.readByte();
       conf.mAutoDismiss = source.readByte() == 1;
       conf.mOverlayTarget = source.readByte() == 1;
       return conf;

@@ -1,8 +1,10 @@
 package com.binioter.guideview;
 
+import android.graphics.Rect;
 import android.support.annotation.AnimatorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.IntRange;
+import android.util.SparseArray;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import java.util.List;
  * </p>
  * <h3>工作原理</h3>
  * 首先它需要一个目标View或者它的id,我们通过findViewById来得到这个View，计算它在屏幕上的区域targetRect,参见
- * {@link #setTargetViewId(int)}与{@link #setTargetView(View)}通过这个区域，
+ * {@link #addTargetView(View)}通过这个区域，
  * 开始绘制一个覆盖整个Activity的遮罩，可以定义蒙板的颜色{@link #setFullingColorId(int)}和透明度
  * {@link #setAlpha(int)}。然而目标View的区域不会被绘制从而实现高亮的效果。
  * </p>
@@ -50,6 +52,7 @@ public class GuideBuilder {
     private boolean mBuilt;
 
     private List<Component> mComponents = new ArrayList<Component>();
+    private SparseArray<HighlightArea> mHighlightAreas;
     private OnVisibilityChangedListener mOnVisibilityChangedListener;
     private OnSlideListener mOnSlideListener;
 
@@ -58,6 +61,7 @@ public class GuideBuilder {
      */
     public GuideBuilder() {
         mConfiguration = new Configuration();
+        mHighlightAreas = new SparseArray<>();
     }
 
     /**
@@ -76,28 +80,30 @@ public class GuideBuilder {
         return this;
     }
 
+
     /**
      * 设置目标view
      */
-    public GuideBuilder setTargetView(View v) {
-        if (mBuilt) {
-            throw new BuildException("Already created. rebuild a new one.");
-        }
-        mConfiguration.mTargetView = v;
+    public GuideBuilder addTargetView(View v) {
+        addTargetView(v,0,0);
         return this;
     }
 
     /**
-     * 设置目标View的id
-     *
-     * @param id 目标View的id
-     * @return GuideBuilder
+     * 设置目标view
      */
-    public GuideBuilder setTargetViewId(@IdRes int id) {
+    public GuideBuilder addTargetView(View v, int corner, int padding) {
+        addTargetView(v,corner,new Rect(padding,padding,padding,padding),0);
+        return this;
+    }
+    /**
+     * 设置目标view
+     */
+    public GuideBuilder addTargetView(View v,int corner,Rect padding,int style) {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         }
-        mConfiguration.mTargetViewId = id;
+        mHighlightAreas.append(v.getId(),new HighlightArea(v,corner,padding,style,new RoundShape()));
         return this;
     }
 
@@ -210,6 +216,27 @@ public class GuideBuilder {
             throw new BuildException("Already created, rebuild a new one.");
         }
         mComponents.add(component);
+        return this;
+    }
+
+    public GuideBuilder setShowMode(int showMode){
+        if (mBuilt) {
+            throw new BuildException("Already created, rebuild a new one.");
+        }
+        mConfiguration.mShowMode = showMode;
+        return this;
+    }
+
+    /**
+     * 仅焦点可点击
+     * @param b
+     * @return
+     */
+    public GuideBuilder focusClick(boolean b){
+        if (mBuilt) {
+            throw new BuildException("Already created, rebuild a new one.");
+        }
+        mConfiguration.focusClick = b;
         return this;
     }
 
@@ -331,6 +358,7 @@ public class GuideBuilder {
         Guide guide = new Guide();
         Component[] components = new Component[mComponents.size()];
         guide.setComponents(mComponents.toArray(components));
+        guide.setTargetViews(mHighlightAreas);
         guide.setConfiguration(mConfiguration);
         guide.setCallback(mOnVisibilityChangedListener);
         guide.setOnSlideListener(mOnSlideListener);

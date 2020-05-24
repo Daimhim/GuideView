@@ -7,9 +7,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.binioter.guideview.Component;
 import com.binioter.guideview.Guide;
 import com.binioter.guideview.GuideBuilder;
+import com.binioter.guideview.MaskView;
 import com.demo.component.LottieComponent;
 import com.demo.component.MutiComponent;
 import com.demo.component.SimpleComponent;
@@ -28,23 +28,26 @@ public class SimpleGuideViewActivity extends Activity {
     header_imgbtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
+        showGuideView();
         Toast.makeText(SimpleGuideViewActivity.this, "show", Toast.LENGTH_SHORT).show();
       }
     });
     ll_nearby = (LinearLayout) findViewById(R.id.ll_nearby);
     ll_video = (LinearLayout) findViewById(R.id.ll_video);
-    header_imgbtn.post(new Runnable() {
-      @Override
-      public void run() {
-        showGuideView();
-      }
-    });
+//    header_imgbtn.post(new Runnable() {
+//      @Override
+//      public void run() {
+//        showGuideView();
+//      }
+//    });
   }
 
   public void showGuideView() {
     GuideBuilder builder = new GuideBuilder();
-    builder.setTargetView(header_imgbtn)
+    builder.addTargetView(header_imgbtn,20,0)
+            .addTargetView(ll_video)
             .setAlpha(150)
+//            .setShowMode(MaskView.DIALOG_SHOW)
             .setHighTargetCorner(20)
             .setHighTargetPadding(10);
     builder.setOnVisibilityChangedListener(new GuideBuilder.OnVisibilityChangedListener() {
@@ -65,9 +68,9 @@ public class SimpleGuideViewActivity extends Activity {
 
   public void showGuideView2() {
     final GuideBuilder builder1 = new GuideBuilder();
-    builder1.setTargetView(ll_nearby)
-            .setAlpha(150)
-            .setHighTargetGraphStyle(Component.CIRCLE);
+    builder1.addTargetView(ll_nearby)
+            .setShowMode(MaskView.DIALOG_SHOW)
+            .setAlpha(150);
     builder1.setOnVisibilityChangedListener(new GuideBuilder.OnVisibilityChangedListener() {
       @Override
       public void onShown() {
@@ -86,11 +89,12 @@ public class SimpleGuideViewActivity extends Activity {
 
   public void showGuideView3() {
     final GuideBuilder builder1 = new GuideBuilder();
-    builder1.setTargetView(ll_video)
+    builder1.addTargetView(ll_video)
             .setAlpha(150)
+            .setShowMode(MaskView.DIALOG_SHOW)
             .setHighTargetCorner(20)
-            .setHighTargetPadding(10)
-            .setExitAnimationId(android.R.anim.fade_out);
+            .setHighTargetPadding(10);
+//            .setExitAnimationId(android.R.anim.fade_out);
     builder1.setOnVisibilityChangedListener(new GuideBuilder.OnVisibilityChangedListener() {
       @Override
       public void onShown() {

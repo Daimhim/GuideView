@@ -17,10 +17,11 @@ class Common {
     View view = c.getView(inflater);
     final MaskView.LayoutParams lp = new MaskView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT);
-    lp.offsetX = c.getXOffset();
-    lp.offsetY = c.getYOffset();
-    lp.targetAnchor = c.getAnchor();
-    lp.targetParentPosition = c.getFitPosition();
+    lp.setOffsetX(c.getXOffset());
+    lp.setOffsetY(c.getYOffset());
+    lp.setTargetAnchor(c.getAnchor());
+    lp.setTargetParentPosition(c.getFitPosition());
+    lp.setId(c.getAnchorId());
     view.setLayoutParams(lp);
     return view;
   }
