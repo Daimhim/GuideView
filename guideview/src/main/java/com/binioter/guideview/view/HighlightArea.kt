@@ -1,7 +1,8 @@
-package com.binioter.guideview
+package com.binioter.guideview.view
 
 import android.graphics.Rect
 import android.view.View
+import com.binioter.guideview.shape.IShape
 
 class HighlightArea  {
 

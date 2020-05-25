@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import com.binioter.guideview.Guide;
 import com.binioter.guideview.GuideBuilder;
+import com.binioter.guideview.guide.AbsGuide;
 import com.demo.component.MutiComponent;
 import com.demo.guide.R;
 import java.util.ArrayList;
@@ -96,9 +96,9 @@ public class MyListActivity extends Activity {
         }
       });
 
-      builder.addComponent(new MutiComponent());
-      Guide guide = builder.createGuide();
-      guide.setShouldCheckLocInWindow(true);
+      builder.addComponent(new MutiComponent(targetView.getId()));
+      AbsGuide guide = builder.createGuide();
+//      guide.setShouldCheckLocInWindow(true);
       guide.show((Activity) mContext);
     }
 

@@ -1,19 +1,22 @@
-package com.binioter.guideview;
+package com.binioter.guideview.util;
 
 import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.binioter.guideview.view.Component;
+import com.binioter.guideview.view.MaskView;
+
 /**
  * Created by binIoter
  */
 
-class Common {
+public class Common {
   /**
    * 设置Component
    */
-  static View componentToView(LayoutInflater inflater, Component c) {
+  public static View componentToView(LayoutInflater inflater, Component c) {
     View view = c.getView(inflater);
     final MaskView.LayoutParams lp = new MaskView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -29,7 +32,7 @@ class Common {
   /**
    * Rect在屏幕上去掉状态栏高度的绝对位置
    */
-  static Rect getViewAbsRect(View view, int parentX, int parentY) {
+  public static Rect getViewAbsRect(View view, int parentX, int parentY) {
     int[] loc = new int[2];
     view.getLocationInWindow(loc);
     Rect rect = new Rect();

@@ -7,6 +7,12 @@ import android.support.annotation.IntRange;
 import android.util.SparseArray;
 import android.view.View;
 
+
+import com.binioter.guideview.guide.AbsGuide;
+import com.binioter.guideview.shape.RoundShapeImpl;
+import com.binioter.guideview.view.Component;
+import com.binioter.guideview.view.HighlightArea;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +82,7 @@ public class GuideBuilder {
         } else if (alpha < 0 || alpha > 255) {
             alpha = 0;
         }
-        mConfiguration.mAlpha = alpha;
+        mConfiguration.setMAlpha(alpha);
         return this;
     }
 
@@ -103,7 +109,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         }
-        mHighlightAreas.append(v.getId(),new HighlightArea(v,corner,padding,style,new RoundShape()));
+        mHighlightAreas.append(v.getId(),new HighlightArea(v,corner,padding,style,new RoundShapeImpl()));
         return this;
     }
 
@@ -116,9 +122,9 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         } else if (corner < 0) {
-            mConfiguration.mCorner = 0;
+            mConfiguration.setMCorner(0);
         }
-        mConfiguration.mCorner = corner;
+        mConfiguration.setMCorner(corner);
         return this;
     }
 
@@ -131,7 +137,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         }
-        mConfiguration.mGraphStyle = style;
+        mConfiguration.setMGraphStyle(style);
         return this;
     }
 
@@ -145,7 +151,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         }
-        mConfiguration.mFullingColorId = id;
+        mConfiguration.setMFullingColorId(id);
         return this;
     }
 
@@ -159,7 +165,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created, rebuild a new one.");
         }
-        mConfiguration.mAutoDismiss = b;
+        mConfiguration.setMAutoDismiss(b);
         return this;
     }
 
@@ -173,7 +179,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created, rebuild a new one.");
         }
-        mConfiguration.mOverlayTarget = b;
+        mConfiguration.setMOverlayTarget(b);
         return this;
     }
 
@@ -187,7 +193,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         }
-        mConfiguration.mEnterAnimationId = id;
+        mConfiguration.setMEnterAnimationId(id);
         return this;
     }
 
@@ -201,7 +207,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         }
-        mConfiguration.mExitAnimationId = id;
+        mConfiguration.setMExitAnimationId(id);
         return this;
     }
 
@@ -223,7 +229,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created, rebuild a new one.");
         }
-        mConfiguration.mShowMode = showMode;
+        mConfiguration.setMShowMode(showMode);
         return this;
     }
 
@@ -236,7 +242,7 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created, rebuild a new one.");
         }
-        mConfiguration.focusClick = b;
+        mConfiguration.setFocusClick(b);
         return this;
     }
 
@@ -270,7 +276,7 @@ public class GuideBuilder {
      * @param touchable true 遮罩不可点击，处于不可点击状态 false 可点击，遮罩自己可以处理自身点击事件
      */
     public GuideBuilder setOutsideTouchable(boolean touchable) {
-        mConfiguration.mOutsideTouchable = touchable;
+        mConfiguration.setMOutsideTouchable(touchable);
         return this;
     }
 
@@ -283,79 +289,20 @@ public class GuideBuilder {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         } else if (padding < 0) {
-            mConfiguration.mPadding = 0;
+            mConfiguration.setMPadding(0);
         }
-        mConfiguration.mPadding = padding;
+        mConfiguration.setMPadding(padding);
         return this;
     }
 
-    /**
-     * 设置高亮区域的左侧padding
-     *
-     * @return GuideBuilder
-     */
-    public GuideBuilder setHighTargetPaddingLeft(int padding) {
-        if (mBuilt) {
-            throw new BuildException("Already created. rebuild a new one.");
-        } else if (padding < 0) {
-            mConfiguration.mPaddingLeft = 0;
-        }
-        mConfiguration.mPaddingLeft = padding;
-        return this;
-    }
-
-    /**
-     * 设置高亮区域的顶部padding
-     *
-     * @return GuideBuilder
-     */
-    public GuideBuilder setHighTargetPaddingTop(int padding) {
-        if (mBuilt) {
-            throw new BuildException("Already created. rebuild a new one.");
-        } else if (padding < 0) {
-            mConfiguration.mPaddingTop = 0;
-        }
-        mConfiguration.mPaddingTop = padding;
-        return this;
-    }
-
-    /**
-     * 设置高亮区域的右侧padding
-     *
-     * @return GuideBuilder
-     */
-    public GuideBuilder setHighTargetPaddingRight(int padding) {
-        if (mBuilt) {
-            throw new BuildException("Already created. rebuild a new one.");
-        } else if (padding < 0) {
-            mConfiguration.mPaddingRight = 0;
-        }
-        mConfiguration.mPaddingRight = padding;
-        return this;
-    }
-
-    /**
-     * 设置高亮区域的底部padding
-     *
-     * @return GuideBuilder
-     */
-    public GuideBuilder setHighTargetPaddingBottom(int padding) {
-        if (mBuilt) {
-            throw new BuildException("Already created. rebuild a new one.");
-        } else if (padding < 0) {
-            mConfiguration.mPaddingBottom = 0;
-        }
-        mConfiguration.mPaddingBottom = padding;
-        return this;
-    }
 
     /**
      * 创建Guide，非Fragment版本
      *
      * @return Guide
      */
-    public Guide createGuide() {
-        Guide guide = new Guide();
+    public AbsGuide createGuide() {
+        AbsGuide guide = new GuideFactory().makeGuide(mConfiguration.getMShowMode());
         Component[] components = new Component[mComponents.size()];
         guide.setComponents(mComponents.toArray(components));
         guide.setTargetViews(mHighlightAreas);

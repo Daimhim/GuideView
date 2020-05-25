@@ -1,10 +1,9 @@
-package com.binioter.guideview;
+package com.binioter.guideview.guide;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Rect;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -13,8 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+
+import com.binioter.guideview.util.Common;
+import com.binioter.guideview.view.Component;
+import com.binioter.guideview.Configuration;
+import com.binioter.guideview.util.DimenUtil;
+import com.binioter.guideview.GuideBuilder;
+import com.binioter.guideview.view.HighlightArea;
+import com.binioter.guideview.view.MaskView;
 
 
 /**
@@ -25,9 +30,9 @@ import android.view.animation.AnimationUtils;
  * Created by binIoter
  */
 
-public class Guide implements View.OnKeyListener, View.OnTouchListener {
+public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListener {
 
-    Guide() {
+    AbsGuide() {
 
     }
 
@@ -36,25 +41,24 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
      */
     private static final int SLIDE_THRESHOLD = 30;
     protected Configuration mConfiguration;
-    protected MaskView mMaskView;
     protected Component[] mComponents;
     protected SparseArray<HighlightArea> mHighlightAreas;
     protected GuideBuilder.OnVisibilityChangedListener mOnVisibilityChangedListener;
     protected GuideBuilder.OnSlideListener mOnSlideListener;
 
-    void setConfiguration(Configuration configuration) {
+    public void setConfiguration(Configuration configuration) {
         mConfiguration = configuration;
     }
 
-    void setComponents(Component[] components) {
+    public void setComponents(Component[] components) {
         mComponents = components;
     }
 
-    void setTargetViews(SparseArray<HighlightArea> highlightAreas) {
+    public void setTargetViews(SparseArray<HighlightArea> highlightAreas) {
         mHighlightAreas = highlightAreas;
     }
 
-    void setCallback(GuideBuilder.OnVisibilityChangedListener listener) {
+    public void setCallback(GuideBuilder.OnVisibilityChangedListener listener) {
         this.mOnVisibilityChangedListener = listener;
     }
 
@@ -89,93 +93,12 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
     }
 
 
-    public void show(Context context,Window window,ViewGroup overlay){
-        mMaskView = onCreateView(context, overlay);
-        switch (mConfiguration.mShowMode){
-            case MaskView.VIEW_SHOW:{
-                overlay.addView(mMaskView);
-                break;
-            }
-            case MaskView.DIALOG_SHOW:{
-                Dialog lDialog = new Dialog(context);
-                lDialog.setContentView(mMaskView);
-                Window lWindow = lDialog.getWindow();
-                WindowManager.LayoutParams lAttributes = lWindow.getAttributes();
-                lAttributes.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lAttributes.height = WindowManager.LayoutParams.MATCH_PARENT;
-                lWindow.setAttributes(lAttributes);
-                lWindow.getDecorView().setPadding(0,0,0,0);
-//                lWindow.getDecorView().setMinimumWidth((int) mMaskView.getMOverlayRect().right);
-//                lWindow.getDecorView().setMinimumHeight((int) mMaskView.getMOverlayRect().bottom);
-                lWindow.setBackgroundDrawableResource(android.R.color.transparent);
-                lDialog.show();
-                break;
-            }
-            case MaskView.DIALOG_FRAGMENT_SHOW:{
-                break;
-            }
-        }
-    }
-
-    public void clear() {
-        if (mMaskView == null) {
-            return;
-        }
-        final ViewGroup vp = (ViewGroup) mMaskView.getParent();
-        if (vp == null) {
-            return;
-        }
-        vp.removeView(mMaskView);
-        onDestroy();
-    }
+    public abstract void show(Context context,Window window,ViewGroup overlay);
 
     /**
      * 隐藏该遮罩并回收资源相关
      */
-    public void dismiss() {
-        if (mMaskView == null) {
-            return;
-        }
-        final ViewGroup vp = (ViewGroup) mMaskView.getParent();
-        if (vp == null) {
-            return;
-        }
-        if (mConfiguration.mExitAnimationId != -1) {
-            // mMaskView may leak if context is null
-            Context context = mMaskView.getContext();
-            assert context != null;
-
-            Animation anim = AnimationUtils.loadAnimation(context, mConfiguration.mExitAnimationId);
-            assert anim != null;
-            anim.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    vp.removeView(mMaskView);
-                    if (mOnVisibilityChangedListener != null) {
-                        mOnVisibilityChangedListener.onDismiss();
-                    }
-                    onDestroy();
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            mMaskView.startAnimation(anim);
-        } else {
-            vp.removeView(mMaskView);
-            if (mOnVisibilityChangedListener != null) {
-                mOnVisibilityChangedListener.onDismiss();
-            }
-            onDestroy();
-        }
-    }
+    public abstract void dismiss();
 
     /**
      * 根据locInwindow定位后，是否需要判断loc值非0
@@ -189,14 +112,13 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
         maskView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         maskView.setOnKeyListener(this);
         maskView.setMTargetRects(mHighlightAreas);
-        maskView.setFullingColor(context.getResources().getColor(mConfiguration.mFullingColorId));
-        maskView.setFullingAlpha(mConfiguration.mAlpha);
-        if (mConfiguration.mOutsideTouchable) {
+        maskView.setFullingColor(context.getResources().getColor(mConfiguration.getMFullingColorId()));
+        maskView.setFullingAlpha(mConfiguration.getMAlpha());
+        if (mConfiguration.getMOutsideTouchable()) {
             maskView.setClickable(false);
         } else {
             maskView.setOnTouchListener(this);
         }
-
         // Adds the components to the mask view.
         for (Component c : mComponents) {
             maskView.addView(Common.componentToView(LayoutInflater.from(context), c));
@@ -205,19 +127,17 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
         return maskView;
     }
 
-    private void onDestroy() {
+    protected void onDestroy() {
         mConfiguration = null;
         mComponents = null;
         mOnVisibilityChangedListener = null;
         mOnSlideListener = null;
-        mMaskView.removeAllViews();
-        mMaskView = null;
     }
 
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-            if (mConfiguration != null && mConfiguration.mAutoDismiss) {
+            if (mConfiguration != null && mConfiguration.getMAutoDismiss()) {
                 dismiss();
                 return true;
             } else {
@@ -228,15 +148,23 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
     }
 
     float startY = -1f;
-
+    /**
+     * 如果第一次就确定拦截 之后的事件都传入
+     */
+    private boolean isFocusClick = false;
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         //处理焦点
-        if (mConfiguration.focusClick){
+        if (mConfiguration.getFocusClick() || isFocusClick){
             for (int i = 0; i < mHighlightAreas.size(); i++) {
                 if (isTouchPointInView(mHighlightAreas.valueAt(i).getView(),motionEvent.getRawX(),motionEvent.getRawY())){
                     mHighlightAreas.valueAt(i).getView().dispatchTouchEvent(motionEvent);
+                    isFocusClick = true;
                 }
+            }
+            //复位
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP){
+                isFocusClick = false;
             }
             return true;
         }
@@ -252,7 +180,7 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
                     mOnSlideListener.onSlideListener(GuideBuilder.SlideState.DOWN);
                 }
             }
-            if (mConfiguration != null && mConfiguration.mAutoDismiss) {
+            if (mConfiguration != null && mConfiguration.getMAutoDismiss()) {
                 dismiss();
             }
         }

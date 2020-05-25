@@ -6,13 +6,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.binioter.guideview.Component;
+
+import com.binioter.guideview.view.Component;
 import com.demo.guide.R;
 
 /**
  * Created by binIoter on 16/6/17.
  */
-public class MutiComponent implements Component {
+public class MutiComponent extends Component {
+
+  public MutiComponent(int anchorId) {
+    super(anchorId, Component.ANCHOR_BOTTOM,  Component.FIT_CENTER, 0, 20);
+  }
 
   @Override public View getView(LayoutInflater inflater) {
     LinearLayout ll = new LinearLayout(inflater.getContext());
@@ -36,26 +41,5 @@ public class MutiComponent implements Component {
       }
     });
     return ll;
-  }
-
-  @Override public int getAnchor() {
-    return Component.ANCHOR_BOTTOM;
-  }
-
-  @Override public int getFitPosition() {
-    return Component.FIT_CENTER;
-  }
-
-  @Override public int getXOffset() {
-    return 0;
-  }
-
-  @Override public int getYOffset() {
-    return 20;
-  }
-
-  @Override
-  public int getAnchorId() {
-    return 0;
   }
 }
