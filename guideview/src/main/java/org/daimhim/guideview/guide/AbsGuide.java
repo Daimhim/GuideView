@@ -18,6 +18,7 @@ import org.daimhim.guideview.view.Component;
 import org.daimhim.guideview.Configuration;
 import org.daimhim.guideview.util.DimenUtil;
 import org.daimhim.guideview.GuideBuilder;
+import org.daimhim.guideview.view.FocusView;
 import org.daimhim.guideview.view.HighlightArea;
 import org.daimhim.guideview.view.MaskView;
 
@@ -109,8 +110,6 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
 
     protected MaskView onCreateView(Context context, ViewGroup overlay) {
         MaskView maskView = new MaskView(context);
-        maskView.setFocusable(true);
-        maskView.setFocusableInTouchMode(true);
         Rect rect = new Rect();
         overlay.getWindowVisibleDisplayFrame(rect);
         maskView.getMOverlayRect().set(rect);
@@ -128,6 +127,7 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
         for (Component c : mComponents) {
             maskView.addView(Common.componentToView(LayoutInflater.from(context), c));
         }
+//        FocusView focusView = new FocusView(context);
 
         return maskView;
     }

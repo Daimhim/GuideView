@@ -10,6 +10,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import org.daimhim.guideview.util.Common
+import java.lang.NullPointerException
 
 class MaskView
     : ViewGroup {
@@ -197,8 +198,14 @@ class MaskView
         return true
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        println("onKeyDown"+ event?.action)
+        throw NullPointerException("onKeyDown"+ event?.action)
+        return super.onKeyDown(keyCode, event)
+    }
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-        println("dispatchKeyEventdispatchKeyEventdispatchKeyEvent"+ event?.action)
+        throw NullPointerException("onKeyDown"+ event?.action)
+        println("dispatchKeyEvent"+ event?.action)
         return true
     }
 
