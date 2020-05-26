@@ -4,13 +4,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import com.binioter.guideview.Component;
+
+import com.binioter.guideview.view.Component;
 import com.demo.guide.R;
 
 /**
  * Created by binIoter on 16/6/17.
  */
-public class SimpleComponent implements Component {
+public class SimpleComponent extends Component {
+
+  public SimpleComponent(int anchorId) {
+    super(anchorId, Component.ANCHOR_BOTTOM, Component.FIT_END, 0, 10);
+  }
 
   @Override public View getView(LayoutInflater inflater) {
 
@@ -21,26 +26,5 @@ public class SimpleComponent implements Component {
       }
     });
     return ll;
-  }
-
-  @Override public int getAnchor() {
-    return Component.ANCHOR_BOTTOM;
-  }
-
-  @Override public int getFitPosition() {
-    return Component.FIT_END;
-  }
-
-  @Override public int getXOffset() {
-    return 0;
-  }
-
-  @Override public int getYOffset() {
-    return 10;
-  }
-
-  @Override
-  public int getAnchorId() {
-    return 0;
   }
 }

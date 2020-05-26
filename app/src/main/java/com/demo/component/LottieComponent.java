@@ -5,13 +5,17 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.binioter.guideview.Component;
+import com.binioter.guideview.view.Component;
 import com.demo.guide.R;
 
 /**
  * Created by binIoter on 16/6/17.
  */
-public class LottieComponent implements Component {
+public class LottieComponent extends Component {
+
+  public LottieComponent(int anchorId) {
+    super(anchorId, Component.ANCHOR_TOP, Component.FIT_CENTER, 0, -30);
+  }
 
   @Override public View getView(LayoutInflater inflater) {
 
@@ -22,26 +26,5 @@ public class LottieComponent implements Component {
       }
     });
     return ll;
-  }
-
-  @Override public int getAnchor() {
-    return Component.ANCHOR_TOP;
-  }
-
-  @Override public int getFitPosition() {
-    return Component.FIT_CENTER;
-  }
-
-  @Override public int getXOffset() {
-    return 0;
-  }
-
-  @Override public int getYOffset() {
-    return -30;
-  }
-
-  @Override
-  public int getAnchorId() {
-    return 0;
   }
 }

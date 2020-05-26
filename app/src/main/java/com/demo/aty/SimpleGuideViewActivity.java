@@ -7,9 +7,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.binioter.guideview.Guide;
 import com.binioter.guideview.GuideBuilder;
-import com.binioter.guideview.MaskView;
+import com.binioter.guideview.guide.AbsGuide;
+import com.binioter.guideview.view.MaskView;
 import com.demo.component.LottieComponent;
 import com.demo.component.MutiComponent;
 import com.demo.component.SimpleComponent;
@@ -45,11 +45,9 @@ public class SimpleGuideViewActivity extends Activity {
   public void showGuideView() {
     GuideBuilder builder = new GuideBuilder();
     builder.addTargetView(header_imgbtn,20,0)
-            .addTargetView(ll_video)
-            .setAlpha(150)
-//            .setShowMode(MaskView.DIALOG_SHOW)
-            .setHighTargetCorner(20)
-            .setHighTargetPadding(10);
+//            .addTargetView(ll_video)
+            .setAlpha(150)/*
+            .setShowMode(MaskView.DIALOG_SHOW)*/;
     builder.setOnVisibilityChangedListener(new GuideBuilder.OnVisibilityChangedListener() {
       @Override
       public void onShown() {
@@ -61,8 +59,8 @@ public class SimpleGuideViewActivity extends Activity {
       }
     });
 
-    builder.addComponent(new SimpleComponent());
-    Guide guide = builder.createGuide();
+    builder.addComponent(new SimpleComponent(header_imgbtn.getId()));
+    AbsGuide guide = builder.createGuide();
     guide.show(SimpleGuideViewActivity.this);
   }
 
@@ -82,8 +80,8 @@ public class SimpleGuideViewActivity extends Activity {
       }
     });
 
-    builder1.addComponent(new MutiComponent());
-    Guide guide = builder1.createGuide();
+    builder1.addComponent(new MutiComponent(ll_nearby.getId()));
+    AbsGuide guide = builder1.createGuide();
     guide.show(SimpleGuideViewActivity.this);
   }
 
@@ -105,8 +103,8 @@ public class SimpleGuideViewActivity extends Activity {
       }
     });
 
-    builder1.addComponent(new LottieComponent());
-    Guide guide = builder1.createGuide();
+    builder1.addComponent(new LottieComponent(ll_video.getId()));
+    AbsGuide guide = builder1.createGuide();
     guide.setShouldCheckLocInWindow(false);
     guide.show(SimpleGuideViewActivity.this);
   }

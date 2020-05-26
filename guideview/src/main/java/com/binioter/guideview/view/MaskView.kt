@@ -1,17 +1,16 @@
-package com.binioter.guideview
+package com.binioter.guideview.view
 
 import android.content.Context
 import android.graphics.*
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
-import android.util.DisplayMetrics
 import android.util.SparseArray
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
+import com.binioter.guideview.util.Common
 
-open class MaskView
+class MaskView
     : ViewGroup {
     /**
      * 蒙层区域
@@ -24,41 +23,38 @@ open class MaskView
     var mTargetRects = SparseArray<HighlightArea>()
 
 
-    private val mStyle = ROUNDRECT
-
     /**
      * 挖空画笔
      */
-    private var mEraser: Paint
+    private lateinit var mEraser: Paint
     /**
      * 橡皮擦Bitmap
      */
-    private var mEraserBitmap: Bitmap
+    private lateinit var mEraserBitmap: Bitmap
     /**
      * 橡皮擦Cavas
      */
-    private val mEraserCanvas: Canvas
+    private lateinit var mEraserCanvas: Canvas
 
     /**
      * 蒙层背景画笔
      */
-    private val mFullingPaint: Paint
+    private var mFullingPaint: Paint = Paint()
+
+    private val mStyle = ROUNDRECT
+
+    private val temRectF = RectF()
 
     constructor(context: Context?):this(context,null,0)
     constructor(context: Context?, attrs: AttributeSet?):this(context, attrs, 0)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int):super(context, attrs, defStyleAttr){
         //自我绘制
         setWillNotDraw(false)
-        val wm = getContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val displayMetrics = DisplayMetrics()
-        wm.defaultDisplay.getRealMetrics(displayMetrics)
-        val width = displayMetrics.widthPixels
-        val height = displayMetrics.heightPixels
-        mOverlayRect.set(0F,0F,width.toFloat(),height.toFloat())
-        mEraserBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    }
+
+    private fun initPaintAndCanvas() {
+        mEraserBitmap = Bitmap.createBitmap(mOverlayRect.right.toInt(), mOverlayRect.bottom.toInt(), Bitmap.Config.ARGB_8888)
         mEraserCanvas = Canvas(mEraserBitmap)
-        mFullingPaint = Paint()
-//        mFullingPaint.style = Paint.Style.STROKE
         mEraser = Paint()
         mEraser.color = Color.WHITE
         //图形重叠时的处理方式，擦除效果
@@ -72,31 +68,27 @@ open class MaskView
         val w = MeasureSpec.getSize(widthMeasureSpec)
         val h = MeasureSpec.getSize(heightMeasureSpec)
         setMeasuredDimension(w, h)
-        var valueAt:HighlightArea
-        val loc = IntArray(2)
-        getLocationInWindow(loc)
-        for (i in 0 until mTargetRects.size()) {
-            valueAt = mTargetRects.valueAt(i)
-            valueAt.rect.set(Common.getViewAbsRect(valueAt.view, loc[0], loc[1]))
-        }
-        mOverlayRect.set(0F,0F,w.toFloat(),h.toFloat())
         var childAt : View
         for (index in 0 until childCount){
             childAt = getChildAt(index)
             measureChild(childAt,widthMeasureSpec,heightMeasureSpec)
         }
+        var valueAt: HighlightArea
+        for (i in 0 until mTargetRects.size()) {
+            valueAt = mTargetRects.valueAt(i)
+            valueAt.rect.set(Common.getViewAbsRect(valueAt.view, mOverlayRect.left.toInt(), mOverlayRect.top.toInt()))
+        }
     }
 
     override fun onLayout(changed: Boolean,left:Int, top:Int, right:Int, bottom:Int) {
         var childAt : View
-        var lp : MaskView.LayoutParams
-        var targetRect = mOverlayRect
+        var lp : LayoutParams
         var highlightArea : HighlightArea?
-        var width = 0
-        var height = 0
+        var width : Int
+        var height : Int
         for (index in 0 until childCount){
             //初始化
-            targetRect.set(mOverlayRect)
+            temRectF.set(0F,0F,0F,0F)
             childAt = getChildAt(index)
             width = childAt.measuredWidth;
             height = childAt.measuredHeight;
@@ -104,22 +96,24 @@ open class MaskView
             //如果指定了锚点 就找到它并赋值
             highlightArea = mTargetRects.get(lp.id)
             highlightArea?.let {
-                targetRect.set(it.rect)
+                temRectF.set(it.rect)
             }
-            var childLeft  : Float = 0F
-            var childTop : Float = 0F
+            var height1 = temRectF.height()
+            var width1 = temRectF.width()
+            var childLeft = 0F
+            var childTop = 0F
             //垂直
             if (lp.targetAnchor == LayoutParams.ANCHOR_LEFT
                     || lp.targetAnchor == LayoutParams.ANCHOR_RIGHT){
                 when (lp.targetParentPosition) {
                     LayoutParams.PARENT_START -> {
-                        childTop = targetRect.top + lp.offsetY
+                        childTop = temRectF.top + lp.offsetY
                     }
                     LayoutParams.PARENT_CENTER -> {
-                        childTop = ((targetRect.height() - height) / 2) + lp.offsetY
+                        childTop = temRectF.bottom - (temRectF.height()/2)  - (height/2) + lp.offsetY
                     }
                     LayoutParams.PARENT_END -> {
-                        childTop = (targetRect.bottom - height) + lp.offsetY
+                        childTop = (temRectF.bottom - height) + lp.offsetY
                     }
                 }
 
@@ -128,34 +122,34 @@ open class MaskView
                 //水平
                 when (lp.targetParentPosition) {
                     LayoutParams.PARENT_START -> {
-                        childLeft = targetRect.left + lp.offsetX
+                        childLeft = temRectF.left + lp.offsetX
                     }
                     LayoutParams.PARENT_CENTER -> {
-                        childLeft = ((targetRect.width() - width)/2) + lp.offsetX
+                        childLeft = temRectF.right - (temRectF.width()/2)  - (width/2) + lp.offsetX
                     }
                     LayoutParams.PARENT_END -> {
-                        childLeft = (targetRect.right - width) + lp.offsetX
+                        childLeft = temRectF.right + lp.offsetX
                     }
                 }
             }
             //垂直
             when(lp.targetAnchor){
-                LayoutParams.ANCHOR_LEFT->{
-                    childLeft = (targetRect.left - width) + lp.offsetX
+                LayoutParams.ANCHOR_LEFT ->{
+                    childLeft = (temRectF.left - width) + lp.offsetX
                 }
-                LayoutParams.ANCHOR_RIGHT->{
-                    childLeft = (targetRect.right) + lp.offsetX
+                LayoutParams.ANCHOR_RIGHT ->{
+                    childLeft = (temRectF.right) + lp.offsetX
                 }
-                LayoutParams.ANCHOR_TOP->{
-                   childTop = (targetRect.top - height) + lp.offsetY
+                LayoutParams.ANCHOR_TOP ->{
+                   childTop = (temRectF.top - height) + lp.offsetY
                 }
-                LayoutParams.ANCHOR_BOTTOM->{
-                    childTop = (targetRect.bottom) + lp.offsetY
+                LayoutParams.ANCHOR_BOTTOM ->{
+                    childTop = (temRectF.bottom) + lp.offsetY
                 }
-                LayoutParams.ANCHOR_OVER->{
+                LayoutParams.ANCHOR_OVER ->{
 
                 }
-                LayoutParams.ANCHOR_IN_PARENT->{
+                LayoutParams.ANCHOR_IN_PARENT ->{
                     val DEFAULT_CHILD_GRAVITY = Gravity.TOP or Gravity.START
                     var gravity: Int = lp.targetParentPosition
                     if (gravity == -1) {
@@ -180,23 +174,25 @@ open class MaskView
                     }
                 }
             }
+            childTop += mOverlayRect.top
             childAt.layout(childLeft.toInt(), childTop.toInt(), childLeft.toInt() + width, childTop.toInt() + height)
         }
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        initPaintAndCanvas()
         mEraserBitmap.eraseColor(Color.TRANSPARENT)
         mEraserCanvas.drawColor(mFullingPaint.color)
-        var valueAt:HighlightArea
+        var valueAt: HighlightArea
         for (i in 0 until mTargetRects.size()) {
             valueAt = mTargetRects.valueAt(i)
-            valueAt.shape.drawShape(mEraserCanvas,valueAt.rect,valueAt.padding,valueAt.corner,mEraser)
+            valueAt.shape.drawShape(mEraserCanvas,valueAt,mEraser)
         }
         canvas.drawBitmap(mEraserBitmap,mOverlayRect.left,mOverlayRect.top,null);
     }
     override fun generateDefaultLayoutParams(): LayoutParams {
-        return LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        return LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
@@ -208,17 +204,17 @@ open class MaskView
             e.printStackTrace()
         }
     }
-    override fun dispatchDraw(canvas: Canvas) {
-        val drawingTime = drawingTime
-        try {
-            var child: View?
-            for (i in 0 until childCount) {
-                child = getChildAt(i)
-                drawChild(canvas, child, drawingTime)
-            }
-        } catch (e: NullPointerException) {
-        }
-    }
+//    override fun dispatchDraw(canvas: Canvas) {
+//        val drawingTime = drawingTime
+//        try {
+//            var child: View?
+//            for (i in 0 until childCount) {
+//                child = getChildAt(i)
+//                drawChild(canvas, child, drawingTime)
+//            }
+//        } catch (e: NullPointerException) {
+//        }
+//    }
     fun setFullingAlpha(alpha: Int) {
         mFullingPaint.alpha = alpha
     }
