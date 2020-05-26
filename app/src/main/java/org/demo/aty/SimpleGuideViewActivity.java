@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.daimhim.guideview.GuideBuilder;
 import org.daimhim.guideview.guide.AbsGuide;
 import org.daimhim.guideview.view.MaskView;
@@ -15,7 +17,7 @@ import org.demo.component.MutiComponent;
 import org.demo.component.SimpleComponent;
 import com.demo.guide.R;
 
-public class SimpleGuideViewActivity extends Activity {
+public class SimpleGuideViewActivity extends AppCompatActivity {
 
   private Button header_imgbtn;
   private LinearLayout ll_nearby, ll_video;
@@ -45,20 +47,10 @@ public class SimpleGuideViewActivity extends Activity {
   public void showGuideView() {
     GuideBuilder builder = new GuideBuilder();
     builder.addTargetView(header_imgbtn,20,0)
-//            .addTargetView(ll_video)
-            .setAlpha(150)/*
-            .setShowMode(MaskView.DIALOG_SHOW)*/;
-    builder.setOnVisibilityChangedListener(new GuideBuilder.OnVisibilityChangedListener() {
-      @Override
-      public void onShown() {
-      }
-
-      @Override
-      public void onDismiss() {
-        showGuideView2();
-      }
-    });
-
+            .setOutsideTouchable(false)
+            .setAutoDismiss(true)
+            .focusClick(true)
+            .setAlpha(150);
     builder.addComponent(new SimpleComponent(header_imgbtn.getId()));
     AbsGuide guide = builder.createGuide();
     guide.show(SimpleGuideViewActivity.this);

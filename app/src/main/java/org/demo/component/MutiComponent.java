@@ -2,6 +2,7 @@ package org.demo.component;
 
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,11 +20,14 @@ public class MutiComponent extends Component {
     super(anchorId, Component.ANCHOR_BOTTOM,  Component.FIT_CENTER, 0, 20);
   }
 
-  @Override public View getView(LayoutInflater inflater) {
+
+
+  @Override
+  public View getView(LayoutInflater inflater) {
     LinearLayout ll = new LinearLayout(inflater.getContext());
     LinearLayout.LayoutParams param =
-        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT);
+            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
     ll.setOrientation(LinearLayout.VERTICAL);
     ll.setLayoutParams(param);
     TextView textView = new TextView(inflater.getContext());

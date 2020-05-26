@@ -2,6 +2,7 @@ package org.demo.component;
 
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -17,8 +18,8 @@ public class LottieComponent extends Component {
     super(anchorId, Component.ANCHOR_TOP, Component.FIT_CENTER, 0, -30);
   }
 
-  @Override public View getView(LayoutInflater inflater) {
-
+  @Override
+  public View getView(LayoutInflater inflater) {
     LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.layer_lottie, null);
     ll.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {

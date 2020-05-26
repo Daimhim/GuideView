@@ -1,5 +1,6 @@
 package org.daimhim.guideview.guide;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -108,11 +109,15 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
 //        mShouldCheckLocInWindow = set;/**/
     }
 
+
     protected MaskView onCreateView(Context context, ViewGroup overlay) {
         MaskView maskView = new MaskView(context);
         Rect rect = new Rect();
         overlay.getWindowVisibleDisplayFrame(rect);
         maskView.getMOverlayRect().set(rect);
+        maskView.setFocusableInTouchMode(true);
+        maskView.setFocusable(true);
+        maskView.requestFocus();
         maskView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         maskView.setOnKeyListener(this);
         maskView.setMTargetRects(mHighlightAreas);
@@ -125,10 +130,8 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
         }
         // Adds the components to the mask view.
         for (Component c : mComponents) {
-            maskView.addView(Common.componentToView(LayoutInflater.from(context), c));
+           maskView.addView(Common.componentToView(LayoutInflater.from(context), c));
         }
-//        FocusView focusView = new FocusView(context);
-
         return maskView;
     }
 
@@ -141,6 +144,7 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
 
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
+        Log.i("onKey",event.toString());
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
             if (mConfiguration != null && mConfiguration.getMAutoDismiss()) {
                 dismiss();

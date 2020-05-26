@@ -2,6 +2,7 @@ package org.daimhim.guideview.view
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 
 /**
  * * 遮罩系统中相对于目标区域而绘制一些图片或者文字等view需要实现的接口. <br></br>

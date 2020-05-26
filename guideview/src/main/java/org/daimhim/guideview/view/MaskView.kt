@@ -100,8 +100,6 @@ class MaskView
             highlightArea?.let {
                 temRectF.set(it.rect)
             }
-            var height1 = temRectF.height()
-            var width1 = temRectF.width()
             var childLeft = 0F
             var childTop = 0F
             //垂直
@@ -192,21 +190,6 @@ class MaskView
             valueAt.shape.drawShape(mEraserCanvas,valueAt,mEraser)
         }
         canvas.drawBitmap(mEraserBitmap,mOverlayRect.left,mOverlayRect.top,null);
-    }
-
-    override fun isFocused(): Boolean {
-        return true
-    }
-
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        println("onKeyDown"+ event?.action)
-        throw NullPointerException("onKeyDown"+ event?.action)
-        return super.onKeyDown(keyCode, event)
-    }
-    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-        throw NullPointerException("onKeyDown"+ event?.action)
-        println("dispatchKeyEvent"+ event?.action)
-        return true
     }
 
     override fun generateDefaultLayoutParams(): LayoutParams {
