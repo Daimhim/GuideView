@@ -51,7 +51,7 @@ version = android.defaultConfig.versionName
 //生成源文件
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
+    getArchiveClassifier().set('sources')
 }
 //生成文档
 task javadoc(type: Javadoc) {
@@ -67,7 +67,7 @@ task javadoc(type: Javadoc) {
 
 //文档打包成jar
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    getArchiveClassifier().set('javadoc')
     from javadoc.destinationDir
 }
 //拷贝javadoc文件
