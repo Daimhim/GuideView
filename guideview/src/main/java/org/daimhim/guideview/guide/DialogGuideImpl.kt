@@ -32,6 +32,9 @@ class DialogGuideImpl : AbsGuide() {
             lWindow.setBackgroundDrawable(ColorDrawable(Color.BLUE))
         }
         mDialog!!.show()
+        mDialog?.setOnCancelListener {
+
+        }
     }
 
     override fun dismiss() {

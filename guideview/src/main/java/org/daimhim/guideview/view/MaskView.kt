@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
+import android.util.Log
 import android.util.SparseArray
 import android.view.Gravity
 import android.view.KeyEvent
@@ -206,6 +207,7 @@ class MaskView
             e.printStackTrace()
         }
     }
+
 //    override fun dispatchDraw(canvas: Canvas) {
 //        val drawingTime = drawingTime
 //        try {

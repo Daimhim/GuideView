@@ -1,4 +1,10 @@
-* <h1>版本更新</h1> 
+* <h1>版本更新</h1>
++ <h5>1.0.2</h5>
+1. 增加返回键的可控，新增Cancelable属性和监听
+2. mOutsideTouchable属性可以控制所有蒙层是否可以被点击
+3. focusClick 仅焦点可以被点击 最好和mOutsideTouchable结合使用
++ <h5>1.0.1</h5>
+1. 修改了部分BUG
 + <h5>1.0.0</h5>
 1. 加入kotlin
 2. 扩展了蒙层子View功能

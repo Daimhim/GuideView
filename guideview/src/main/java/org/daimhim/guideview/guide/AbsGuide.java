@@ -47,6 +47,11 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
     protected SparseArray<HighlightArea> mHighlightAreas;
     protected GuideBuilder.OnVisibilityChangedListener mOnVisibilityChangedListener;
     protected GuideBuilder.OnSlideListener mOnSlideListener;
+    protected  GuideBuilder.OnCancelListener mOnCancelListener;
+
+    public void setOnCancelListener(GuideBuilder.OnCancelListener onCancelListener){
+        mOnCancelListener = onCancelListener;
+    }
 
     public void setConfiguration(Configuration configuration) {
         mConfiguration = configuration;
@@ -144,14 +149,17 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
 
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
-        Log.i("onKey",event.toString());
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-            if (mConfiguration != null && mConfiguration.getMAutoDismiss()) {
+            /**
+             * 是否可以被返回键
+             */
+            if (mConfiguration != null && mConfiguration.getMCancelable()) {
+                if (mOnCancelListener != null){
+                    mOnCancelListener.onCancel(this);
+                }
                 dismiss();
-                return true;
-            } else {
-                return false;
             }
+            return true;
         }
         return false;
     }
@@ -161,10 +169,14 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         Log.i("onTouch",motionEvent.toString());
-        //处理焦点
-        if (mConfiguration.getFocusClick()){
-            //默认拦截
-            boolean result = true;
+        //默认拦截
+        boolean result = true;
+        //焦点之外都可以点击
+        if (mConfiguration.getMOutsideTouchable()){
+            result = false;
+        }
+        //仅处理焦点
+        if (mConfiguration.getFocusClick() && !mConfiguration.getMOutsideTouchable()){
             //DOWN 事件，寻找处理的View
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 View currentView = null;
@@ -181,25 +193,26 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
                     }
                 }
             }
-            return result;
         }
-        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            startY = motionEvent.getY();
-        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            if (startY - motionEvent.getY() > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
-                if (mOnSlideListener != null) {
-                    mOnSlideListener.onSlideListener(GuideBuilder.SlideState.UP);
-                }
-            } else if (motionEvent.getY() - startY > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
-                if (mOnSlideListener != null) {
-                    mOnSlideListener.onSlideListener(GuideBuilder.SlideState.DOWN);
-                }
-            }
-            if (mConfiguration != null && mConfiguration.getMAutoDismiss()) {
-                dismiss();
-            }
-        }
-        return true;
+        return result;
+
+//        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+//            startY = motionEvent.getY();
+//        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+//            if (startY - motionEvent.getY() > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
+//                if (mOnSlideListener != null) {
+//                    mOnSlideListener.onSlideListener(GuideBuilder.SlideState.UP);
+//                }
+//            } else if (motionEvent.getY() - startY > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
+//                if (mOnSlideListener != null) {
+//                    mOnSlideListener.onSlideListener(GuideBuilder.SlideState.DOWN);
+//                }
+//            }
+//            if (mConfiguration != null && mConfiguration.getMAutoDismiss()) {
+//                dismiss();
+//            }
+//        }
+//        return true;
     }
 
     private boolean isTouchPointInView(View targetView, float xAxis, float yAxis) {

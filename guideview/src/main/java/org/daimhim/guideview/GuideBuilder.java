@@ -61,6 +61,7 @@ public class GuideBuilder {
     private SparseArray<HighlightArea> mHighlightAreas;
     private OnVisibilityChangedListener mOnVisibilityChangedListener;
     private OnSlideListener mOnSlideListener;
+    private OnCancelListener mOnCancelListener;
 
     /**
      * 构造函数
@@ -274,6 +275,17 @@ public class GuideBuilder {
         mOnVisibilityChangedListener = onVisibilityChangedListener;
         return this;
     }
+    /**
+     * 设置取消监听回调
+     */
+    public GuideBuilder setOnCancelListener(
+            OnCancelListener onCancelListener) {
+        if (mBuilt) {
+            throw new BuildException("Already created, rebuild a new one.");
+        }
+        mOnCancelListener = onCancelListener;
+        return this;
+    }
 
     /**
      * 设置手势滑动的监听回调
@@ -312,6 +324,18 @@ public class GuideBuilder {
         return this;
     }
 
+    /**
+     * 是否可以被返回
+     * @param flag
+     * @return
+     */
+    public GuideBuilder setCancelable(boolean flag) {
+        if (mBuilt) {
+            throw new BuildException("Already created. rebuild a new one.");
+        }
+        mConfiguration.setMCancelable(flag);
+        return this;
+    }
 
     /**
      * 创建Guide，非Fragment版本
@@ -325,10 +349,12 @@ public class GuideBuilder {
         guide.setTargetViews(mHighlightAreas);
         guide.setConfiguration(mConfiguration);
         guide.setCallback(mOnVisibilityChangedListener);
+        guide.setOnCancelListener(mOnCancelListener);
         guide.setOnSlideListener(mOnSlideListener);
         mComponents = null;
         mConfiguration = null;
         mOnVisibilityChangedListener = null;
+        mOnCancelListener = null;
         mBuilt = true;
         return guide;
     }
@@ -349,5 +375,9 @@ public class GuideBuilder {
         void onShown();
 
         void onDismiss();
+    }
+
+    public static interface OnCancelListener{
+        void onCancel(AbsGuide guide);
     }
 }

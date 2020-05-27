@@ -36,6 +36,12 @@ public class SimpleGuideViewActivity extends AppCompatActivity {
     });
     ll_nearby = (LinearLayout) findViewById(R.id.ll_nearby);
     ll_video = (LinearLayout) findViewById(R.id.ll_video);
+    ll_nearby.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Toast.makeText(v.getContext(),"我被点了",Toast.LENGTH_SHORT).show();
+      }
+    });
 //    header_imgbtn.post(new Runnable() {
 //      @Override
 //      public void run() {
@@ -48,9 +54,15 @@ public class SimpleGuideViewActivity extends AppCompatActivity {
     GuideBuilder builder = new GuideBuilder();
     builder.addTargetView(header_imgbtn,20,0)
             .setOutsideTouchable(false)
-            .setAutoDismiss(true)
             .focusClick(true)
+            .setCancelable(false)
             .setAlpha(150);
+    builder.setOnCancelListener(new GuideBuilder.OnCancelListener() {
+      @Override
+      public void onCancel(AbsGuide guide) {
+        Toast.makeText(SimpleGuideViewActivity.this,"onCancel",Toast.LENGTH_SHORT).show();
+      }
+    });
     builder.addComponent(new SimpleComponent(header_imgbtn.getId()));
     AbsGuide guide = builder.createGuide();
     guide.show(SimpleGuideViewActivity.this);

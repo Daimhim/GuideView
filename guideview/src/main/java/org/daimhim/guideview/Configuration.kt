@@ -18,7 +18,6 @@ class Configuration() : Parcelable {
     /**
      * 是否可以透过蒙层点击，默认不可以
      */
-    
     var mOutsideTouchable = false
 
     /**
@@ -66,10 +65,9 @@ class Configuration() : Parcelable {
     var mOverlayTarget = false
 
     /**
-     * 仅焦点可点击
+     * ，默认 仅焦点可点击
      */
-    
-    var focusClick = false
+    var focusClick = true
     var mShowCloseButton = false
     
     var mEnterAnimationId = -1
@@ -77,6 +75,11 @@ class Configuration() : Parcelable {
     var mExitAnimationId = -1
     
     var mShowMode = MaskView.VIEW_SHOW
+
+    /**
+     * 是否可以取消
+     */
+    var mCancelable = true
 
     constructor(parcel: Parcel) : this() {
         mPadding = parcel.readInt()
