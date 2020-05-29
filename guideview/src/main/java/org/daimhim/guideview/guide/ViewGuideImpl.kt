@@ -20,9 +20,8 @@ class ViewGuideImpl : AbsGuide() {
     override fun show(context: Context, window: Window, overlay: ViewGroup) {
         onCreateView = onCreateView(context, overlay)
 
-        val dm = DisplayMetrics()
-        window.windowManager.defaultDisplay.getRealMetrics(dm)
-        val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dm.heightPixels)
+       val dpl= window.windowManager.defaultDisplay
+        val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpl.height)
         (onCreateView as MaskView?)?.layoutParams = params
 
         if (onCreateView!!.parent == null) {
