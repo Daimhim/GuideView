@@ -21,7 +21,7 @@ class ViewGuideImpl : AbsGuide() {
         onCreateView = onCreateView(context, overlay)
 
         val dm = DisplayMetrics()
-        window.windowManager.defaultDisplay.getMetrics(dm)
+        window.windowManager.defaultDisplay.getRealMetrics(dm)
         val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dm.heightPixels)
         (onCreateView as MaskView?)?.layoutParams = params
 
