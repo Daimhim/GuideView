@@ -2,6 +2,7 @@ package org.daimhim.guideview.view
 
 import android.content.Context
 import android.graphics.*
+import android.os.Build
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.util.Log
@@ -69,7 +70,10 @@ class MaskView
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val w = MeasureSpec.getSize(widthMeasureSpec)
-        val h = MeasureSpec.getSize(heightMeasureSpec)
+        var h = MeasureSpec.getSize(heightMeasureSpec)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            h += getStatusHeight()
+        }
         setMeasuredDimension(w, h)
         var childAt : View
         for (index in 0 until childCount){
@@ -278,5 +282,14 @@ class MaskView
             const val PARENT_CENTER = 0x20
             const val PARENT_END = 0x30
         }
+    }
+    //获取 状态栏高度
+    private fun getStatusHeight(): Int {
+        var height = 0;
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            height = resources.getDimensionPixelSize(resourceId);
+        }
+        return height
     }
 }
