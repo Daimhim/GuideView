@@ -2,6 +2,7 @@ package org.daimhim.guideview
 
 import org.daimhim.guideview.guide.AbsGuide
 import org.daimhim.guideview.guide.DialogGuideImpl
+import org.daimhim.guideview.guide.GuideLayoutGuideImpl
 import org.daimhim.guideview.guide.ViewGuideImpl
 import org.daimhim.guideview.view.MaskView
 
@@ -19,6 +20,9 @@ class GuideFactory {
             }
             MaskView.DIALOG_SHOW->{
                 DialogGuideImpl()
+            }
+            MaskView.GUIDE_LAYOUT_SHOW->{
+                GuideLayoutGuideImpl()
             }
             else->{
                 null

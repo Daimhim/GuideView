@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="GuideView">
+        <attr format="reference" name="guide_bindId">-1</attr>
+        <attr name="guide_shape" format="integer|enum">
+            <enum name="round" value="0"/>
+            <enum name="circle" value="1"/>
+        </attr>
+        <attr name="guide_corner" format="dimension">0dp</attr>
+    </declare-styleable>
+    <declare-styleable name="GuideLayout">
+        <attr name="guide_alpha" format="integer"/>
+        <attr name="guide_color" format="color"/>
+    </declare-styleable>
+    <declare-styleable name="GuideLayout_Layout">
+        <attr name="layout_preview" format="boolean"/>
+    </declare-styleable>
+</resources>

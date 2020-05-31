@@ -1,6 +1,5 @@
 package org.daimhim.guideview.guide;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -17,9 +16,7 @@ import android.view.Window;
 import org.daimhim.guideview.util.Common;
 import org.daimhim.guideview.view.Component;
 import org.daimhim.guideview.Configuration;
-import org.daimhim.guideview.util.DimenUtil;
 import org.daimhim.guideview.GuideBuilder;
-import org.daimhim.guideview.view.FocusView;
 import org.daimhim.guideview.view.HighlightArea;
 import org.daimhim.guideview.view.MaskView;
 
@@ -42,15 +39,13 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
      * 滑动临界值
      */
     private static final int SLIDE_THRESHOLD = 30;
-    protected Configuration mConfiguration;
+    private Configuration mConfiguration;
     protected Component[] mComponents;
     protected SparseArray<HighlightArea> mHighlightAreas;
-    protected GuideBuilder.OnVisibilityChangedListener mOnVisibilityChangedListener;
-    protected GuideBuilder.OnSlideListener mOnSlideListener;
-    protected  GuideBuilder.OnCancelListener mOnCancelListener;
+
 
     public void setOnCancelListener(GuideBuilder.OnCancelListener onCancelListener){
-        mOnCancelListener = onCancelListener;
+        getOnInfoListener().mOnCancelListener = onCancelListener;
     }
 
     public void setConfiguration(Configuration configuration) {
@@ -66,11 +61,11 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
     }
 
     public void setCallback(GuideBuilder.OnVisibilityChangedListener listener) {
-        this.mOnVisibilityChangedListener = listener;
+        getOnInfoListener().mOnVisibilityChangedListener = listener;
     }
 
     public void setOnSlideListener(GuideBuilder.OnSlideListener onSlideListener) {
-        this.mOnSlideListener = onSlideListener;
+        getOnInfoListener().mOnSlideListener = onSlideListener;
     }
 
     /**
@@ -89,6 +84,7 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
     public void show(Dialog dialog) {
         show(dialog.getContext(),dialog.getWindow(), (ViewGroup) dialog.getWindow().getDecorView());
     }
+
     /**
      * 显示遮罩
      *
@@ -99,8 +95,14 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
         show(activity,activity.getWindow(), overlay);
     }
 
-
-    public abstract void show(Context context,Window window,ViewGroup overlay);
+    private ViewGroup mContentView;
+    ViewGroup getContentView(){
+        return mContentView;
+    }
+    protected void show(Context context,Window window,ViewGroup overlay){
+        mContentView = onCreateView(context, window, overlay);
+        onBindView(mContentView);
+    }
 
     /**
      * 隐藏该遮罩并回收资源相关
@@ -114,8 +116,26 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
 //        mShouldCheckLocInWindow = set;/**/
     }
 
+    /**
+     * 创建ViewGroup
+     * @param context
+     * @param window
+     * @param overlay
+     * @return
+     */
+    protected ViewGroup onCreateView(Context context, Window window, ViewGroup overlay){
+        return onCreateView(context, overlay);
+    }
 
-    protected MaskView onCreateView(Context context, ViewGroup overlay) {
+    /***
+     * ViewGroup进行绑定，设定监听
+     * @param pViewGroup
+     */
+    protected void onBindView(ViewGroup pViewGroup){
+
+    }
+
+    private MaskView onCreateView(Context context, ViewGroup overlay) {
         MaskView maskView = new MaskView(context);
         Rect rect = new Rect();
         overlay.getWindowVisibleDisplayFrame(rect);
@@ -143,8 +163,11 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
     protected void onDestroy() {
         mConfiguration = null;
         mComponents = null;
-        mOnVisibilityChangedListener = null;
-        mOnSlideListener = null;
+        mInfoListener.mOnVisibilityChangedListener = null;
+        mInfoListener.mOnSlideListener = null;
+        mInfoListener.mOnCancelListener = null;
+        mInfoListener = null;
+        mContentView = null;
     }
 
     @Override
@@ -154,8 +177,8 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
              * 是否可以被返回键
              */
             if (mConfiguration != null && mConfiguration.getMCancelable()) {
-                if (mOnCancelListener != null){
-                    mOnCancelListener.onCancel(this);
+                if (getOnInfoListener().mOnCancelListener != null){
+                    getOnInfoListener().mOnCancelListener.onCancel(this);
                 }
                 dismiss();
             }
@@ -230,5 +253,31 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
             return true;
         }
         return false;
+    }
+
+    /**
+     * 获取获取参数
+     * @return
+     */
+    Configuration getConfiguration() {
+        if (mConfiguration == null){
+            mConfiguration = new Configuration();
+        }
+        return mConfiguration;
+    }
+
+    private OnInfoListener mInfoListener;
+    OnInfoListener getOnInfoListener() {
+        if (mInfoListener == null){
+            mInfoListener = new OnInfoListener();
+        }
+        return mInfoListener;
+    }
+
+    static class OnInfoListener {
+        GuideBuilder.OnVisibilityChangedListener mOnVisibilityChangedListener;
+        GuideBuilder.OnSlideListener mOnSlideListener;
+        GuideBuilder.OnCancelListener mOnCancelListener;
+
     }
 }

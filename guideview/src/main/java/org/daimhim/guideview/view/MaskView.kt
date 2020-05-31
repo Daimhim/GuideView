@@ -253,6 +253,7 @@ class MaskView
          * 以DialogFragment展示
          */
         const val DIALOG_FRAGMENT_SHOW = 0x03
+        const val GUIDE_LAYOUT_SHOW = 0x04
     }
 
 

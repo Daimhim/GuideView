@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.daimhim.guideview.view.GuideLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/gl_layout"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/preview"
+        app:layout_preview="true"
+        layout="@layout/activity_guide_view_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <org.daimhim.guideview.view.GuideView
+        android:id="@+id/gv_g_1"
+        app:guide_bindId="@+id/tv_add"
+        app:guide_shape="round"
+        app:guide_corner="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <org.daimhim.guideview.view.GuideView
+        android:id="@+id/gv_g_2"
+        app:guide_bindId="@+id/tv_add_2"
+        app:guide_shape="round"
+        app:guide_corner="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <org.daimhim.guideview.view.GuideView
+        android:id="@+id/gv_g_3"
+        app:guide_bindId="@+id/tv_settings"
+        app:guide_shape="round"
+        app:guide_corner="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/casd"
+        app:layout_constraintTop_toBottomOf="@+id/gv_g_2"
+        app:layout_constraintLeft_toLeftOf="@+id/gv_g_2"
+        app:layout_constraintRight_toRightOf="@+id/gv_g_2"
+        android:text="@string/add_friend"
+        android:textColor="@color/color_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</org.daimhim.guideview.view.GuideLayout>

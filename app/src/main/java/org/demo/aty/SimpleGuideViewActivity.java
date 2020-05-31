@@ -3,6 +3,8 @@ package org.demo.aty;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -25,7 +27,10 @@ public class SimpleGuideViewActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+//    requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_simple_guide_view);
+    Window window = getWindow();
+//    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     header_imgbtn = (Button) findViewById(R.id.header_imgbtn);
     header_imgbtn.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -56,6 +61,8 @@ public class SimpleGuideViewActivity extends AppCompatActivity {
             .setOutsideTouchable(false)
             .focusClick(true)
             .setCancelable(false)
+            .setFullingLayoutId(R.layout.test_guide_layout_activity)
+            .setShowMode(MaskView.GUIDE_LAYOUT_SHOW)
             .setAlpha(150);
     builder.setOnCancelListener(new GuideBuilder.OnCancelListener() {
       @Override

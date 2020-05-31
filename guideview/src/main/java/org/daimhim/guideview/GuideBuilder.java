@@ -4,6 +4,7 @@ import android.graphics.Rect;
 import android.support.annotation.AnimatorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.IntRange;
+import android.support.annotation.LayoutRes;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -170,6 +171,20 @@ public class GuideBuilder {
             throw new BuildException("Already created. rebuild a new one.");
         }
         mConfiguration.setMFullingColorId(id);
+        return this;
+    }
+
+    /**
+     * 设置蒙板颜色的资源id
+     *
+     * @param id 资源id
+     * @return GuideBuilder
+     */
+    public GuideBuilder setFullingLayoutId(@LayoutRes int id) {
+        if (mBuilt) {
+            throw new BuildException("Already created. rebuild a new one.");
+        }
+        mConfiguration.setMFullingLayoutId(id);
         return this;
     }
 
