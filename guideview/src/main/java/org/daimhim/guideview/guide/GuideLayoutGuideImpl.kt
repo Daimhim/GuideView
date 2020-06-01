@@ -1,15 +1,13 @@
 package org.daimhim.guideview.guide
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
+import android.view.*
 import org.daimhim.guideview.view.GuideLayout
 
 class GuideLayoutGuideImpl : AbsGuide() {
@@ -27,8 +25,7 @@ class GuideLayoutGuideImpl : AbsGuide() {
             inflate.setOriginalLayout(overlay)
         }
         mDialog = Dialog(context)
-        mDialog!!.setContentView(inflate,ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT))
+        mDialog!!.setContentView(inflate)
         mDialog!!.window?.let {lWindow->
             val lAttributes = lWindow.attributes
             lAttributes.width = WindowManager.LayoutParams.MATCH_PARENT
@@ -39,21 +36,50 @@ class GuideLayoutGuideImpl : AbsGuide() {
             lWindow.decorView.setBackgroundColor(Color.TRANSPARENT)
             lWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
-        val measuredWidth = window.decorView.measuredWidth
-        val measuredHeight = window.decorView.measuredHeight
-        Log.i(TAG, "measuredWidth:$measuredWidth measuredHeight:$measuredHeight")
-        val displayMetrics = DisplayMetrics()
-        window.windowManager.defaultDisplay.getMetrics(displayMetrics)
-        Log.i(TAG, "displayMetrics.widthPixels:${displayMetrics.widthPixels} displayMetrics.heightPixels:${displayMetrics.heightPixels}")
+//        mDialog?.window?.decorView?.post {
+//            var parent = inflate.parent
+//            while (parent != null && parent is ViewGroup) {
+//                if (parent.paddingTop > 0) {
+//                    parent.setPadding(0, 0, 0, 0)
+//                }
+//                parent = parent.parent
+//            }
+//        }
+        window.decorView.post {
+            Log.i(TAG, "window.decorView 111")
+            traverseView(window.decorView,0)
+            Log.i(TAG,"window.decorView 222")
+        }
         return inflate
     }
 
     override fun show(context: Context?, window: Window?, overlay: ViewGroup?) {
         super.show(context, window, overlay)
         mDialog?.show()
+        mDialog?.window?.decorView!!.post {
+            Log.i(TAG, "mDialogmDialog111")
+            traverseView(mDialog?.window?.decorView!!,0)
+            Log.i(TAG,"mDialogmDialog222")
+        }
     }
     override fun dismiss() {
         mDialog?.dismiss()
+    }
+
+
+
+    fun traverseView(pView: View, floor: Int) {
+        var floor = floor
+        if (pView is ViewGroup) {
+            floor++
+            Log.i(TAG, String.format("BaseViewHelp ViewGroup: %s measuredHeight:%s floor:%s paddingTop:%s Top:%s",pView.javaClass.simpleName,pView.measuredHeight, floor,pView.paddingTop,pView.top))
+            val lView = pView
+            for (i in 0 until lView.childCount) {
+                traverseView(lView.getChildAt(i), floor)
+            }
+        } else {
+            Log.i(TAG, String.format("BaseViewHelp View: %s measuredHeight:%s floor:%s paddingTop:%s Top:%s", pView.javaClass.simpleName,pView.measuredHeight,  floor,pView.paddingTop,pView.top))
+        }
     }
 
 }
