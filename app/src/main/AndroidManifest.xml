@@ -22,6 +22,7 @@
       <activity
       android:name="org.demo.aty.MyListActivity"
       android:screenOrientation="portrait" />
+    <activity android:name="org.demo.aty.GuideViewLayoutActivity"/>
   </application>
 
 </manifest>

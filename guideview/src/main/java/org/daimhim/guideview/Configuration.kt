@@ -23,16 +23,7 @@ class Configuration() : Parcelable {
     /**
      * 遮罩透明度
      */
-    
     var mAlpha = 255
-
-    /**
-     * 遮罩覆盖区域控件Id
-     *
-     *
-     * 该控件的大小既该导航页面的大小
-     */
-    var mFullingViewId = -1
 
     /**
      * 高亮区域的圆角大小
@@ -51,6 +42,7 @@ class Configuration() : Parcelable {
      */
     
     var mFullingColorId = R.color.black
+    var mFullingLayoutId = -1
 
     /**
      * 是否在点击的时候自动退出导航
@@ -85,7 +77,6 @@ class Configuration() : Parcelable {
         mPadding = parcel.readInt()
         mOutsideTouchable = parcel.readByte() != 0.toByte()
         mAlpha = parcel.readInt()
-        mFullingViewId = parcel.readInt()
         mCorner = parcel.readInt()
         mGraphStyle = parcel.readInt()
         mFullingColorId = parcel.readInt()
@@ -102,7 +93,6 @@ class Configuration() : Parcelable {
         parcel.writeInt(mPadding)
         parcel.writeByte(if (mOutsideTouchable) 1 else 0)
         parcel.writeInt(mAlpha)
-        parcel.writeInt(mFullingViewId)
         parcel.writeInt(mCorner)
         parcel.writeInt(mGraphStyle)
         parcel.writeInt(mFullingColorId)

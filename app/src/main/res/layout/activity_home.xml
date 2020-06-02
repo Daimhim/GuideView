@@ -19,4 +19,11 @@
         android:text="遮罩listview" />
 
 
+    <Button
+        android:id="@+id/btn_guide_view"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:text="遮罩guide_view" />
+
+
 </LinearLayout>

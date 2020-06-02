@@ -1,5 +1,6 @@
 package org.daimhim.guideview.guide
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -15,10 +16,15 @@ import android.view.WindowManager
  */
 class DialogGuideImpl : AbsGuide() {
     private var mDialog : Dialog? = null
-    override fun show(context: Context, window: Window, overlay: ViewGroup) {
-        val onCreateView = onCreateView(context, overlay)
-        mDialog = Dialog(context)
-        mDialog!!.setContentView(onCreateView)
+    override fun show(activity: Activity, overlay: ViewGroup?) {
+        super.show(activity, overlay)
+    }
+
+    override fun onBindView(pViewGroup: ViewGroup) {
+        super.onBindView(pViewGroup)
+        mDialog = Dialog(pViewGroup.context)
+        mDialog!!.setContentView(pViewGroup)
+//        mDialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mDialog!!.window?.let {lWindow->
             val lAttributes = lWindow.attributes
             lAttributes.width = WindowManager.LayoutParams.MATCH_PARENT
@@ -29,13 +35,12 @@ class DialogGuideImpl : AbsGuide() {
 //                lWindow.getDecorView().setMinimumHeight((int) mMaskView.getMOverlayRect().bottom);
             //                lWindow.getDecorView().setMinimumWidth((int) mMaskView.getMOverlayRect().right);
 //                lWindow.getDecorView().setMinimumHeight((int) mMaskView.getMOverlayRect().bottom);
-            lWindow.setBackgroundDrawable(ColorDrawable(Color.BLUE))
+//            lWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            lWindow.setBackgroundDrawableResource(android.R.color.transparent); //设置window背景透明
         }
         mDialog!!.show()
-        mDialog?.setOnCancelListener {
-
-        }
     }
+
 
     override fun dismiss() {
         mDialog?.let {
