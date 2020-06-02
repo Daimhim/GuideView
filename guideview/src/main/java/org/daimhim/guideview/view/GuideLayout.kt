@@ -75,9 +75,11 @@ class GuideLayout : ConstraintLayout {
         var guideView: View?
         var margin = 0
         mConstraintSet.clone(this)
+        val rect = Rect()
         mGuideViews.forEach {
             guideView = getOriginalLayout()?.findViewById<View>(it.guideBindId)
             guideView?.getLocationInWindow(mLocationArray)
+            guideView?.getGlobalVisibleRect(rect)
             margin = mLocationArray[0]
             if (measuredWidth / 2 > margin) {
                 margin -= it.paddingLeft

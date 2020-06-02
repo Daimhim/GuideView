@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
+import org.daimhim.guideview.util.DimenUtil
 import org.daimhim.guideview.view.GuideLayout
 
 class GuideLayoutGuideImpl : AbsGuide() {
@@ -36,19 +37,14 @@ class GuideLayoutGuideImpl : AbsGuide() {
             lWindow.decorView.setBackgroundColor(Color.TRANSPARENT)
             lWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
-//        mDialog?.window?.decorView?.post {
-//            var parent = inflate.parent
-//            while (parent != null && parent is ViewGroup) {
-//                if (parent.paddingTop > 0) {
-//                    parent.setPadding(0, 0, 0, 0)
-//                }
-//                parent = parent.parent
-//            }
-//        }
-        window.decorView.post {
-            Log.i(TAG, "window.decorView 111")
-            traverseView(window.decorView,0)
-            Log.i(TAG,"window.decorView 222")
+        mDialog?.window?.decorView?.post {
+            var parent = inflate.parent
+            while (parent != null && parent is ViewGroup) {
+                if (parent.paddingTop > 0) {
+                    parent.setPadding(0, 0, 0, 0)
+                }
+                parent = parent.parent
+            }
         }
         return inflate
     }
@@ -56,30 +52,8 @@ class GuideLayoutGuideImpl : AbsGuide() {
     override fun show(context: Context?, window: Window?, overlay: ViewGroup?) {
         super.show(context, window, overlay)
         mDialog?.show()
-        mDialog?.window?.decorView!!.post {
-            Log.i(TAG, "mDialogmDialog111")
-            traverseView(mDialog?.window?.decorView!!,0)
-            Log.i(TAG,"mDialogmDialog222")
-        }
     }
     override fun dismiss() {
         mDialog?.dismiss()
     }
-
-
-
-    fun traverseView(pView: View, floor: Int) {
-        var floor = floor
-        if (pView is ViewGroup) {
-            floor++
-            Log.i(TAG, String.format("BaseViewHelp ViewGroup: %s measuredHeight:%s floor:%s paddingTop:%s Top:%s",pView.javaClass.simpleName,pView.measuredHeight, floor,pView.paddingTop,pView.top))
-            val lView = pView
-            for (i in 0 until lView.childCount) {
-                traverseView(lView.getChildAt(i), floor)
-            }
-        } else {
-            Log.i(TAG, String.format("BaseViewHelp View: %s measuredHeight:%s floor:%s paddingTop:%s Top:%s", pView.javaClass.simpleName,pView.measuredHeight,  floor,pView.paddingTop,pView.top))
-        }
-    }
-
 }
