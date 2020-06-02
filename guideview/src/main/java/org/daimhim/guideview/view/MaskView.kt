@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.Gravity
 import android.view.View
+import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import org.daimhim.guideview.util.Common
 
@@ -74,21 +75,27 @@ class MaskView
         val defaultWidthSize = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
         val defaultHeightSize = View.getDefaultSize(suggestedMinimumHeight, heightMeasureSpec)
         var childAt : View
-        var lp : LayoutParams
-        var childTop = 0
-        var childLeft = 0
+        var lp : LayoutParams = generateDefaultLayoutParams()
+        var childTop = 0F
+        var childLeft = 0F
+        var lWidthMeasureSpec = 0
+        var lHeightMeasureSpec = 0
         for (index in 0 until childCount){
             childAt = getChildAt(index)
             layoutParams = childAt.layoutParams as LayoutParams
             if (lp.id != -1){
-                valueAt = mTargetRects.get(lp.id)
+                temRectF.set(mTargetRects.get(lp.id).rect)
+            }else{
+                temRectF.set(mOverlayRect)
             }
+            measureChild(childAt,widthMeasureSpec,heightMeasureSpec)
             //垂直
             if (lp.targetAnchor == LayoutParams.ANCHOR_LEFT
                     || lp.targetAnchor == LayoutParams.ANCHOR_RIGHT){
                 when (lp.targetParentPosition) {
                     LayoutParams.PARENT_START -> {
                         childTop = temRectF.top + lp.offsetY
+                        lHeightMeasureSpec = MeasureSpec.makeMeasureSpec((defaultHeightSize-childTop).toInt(),MeasureSpec.AT_MOST)
                     }
                     LayoutParams.PARENT_CENTER -> {
                         childTop = temRectF.bottom - (temRectF.height()/2)  - (height/2) + lp.offsetY
@@ -113,9 +120,25 @@ class MaskView
                     }
                 }
             }
-            measureChild(childAt,widthMeasureSpec,heightMeasureSpec)
-            MeasureSpec.makeMeasureSpec()
+            //垂直
+            when(lp.targetAnchor) {
+                LayoutParams.ANCHOR_LEFT -> {
+                    childLeft = (temRectF.left - width) + lp.offsetX
+                }
+                LayoutParams.ANCHOR_RIGHT -> {
+                    childLeft = (temRectF.right) + lp.offsetX
+                }
+                LayoutParams.ANCHOR_TOP -> {
+                    childTop = (temRectF.top - height) + lp.offsetY
+                }
+                LayoutParams.ANCHOR_BOTTOM -> {
+                    childTop = (temRectF.bottom) + lp.offsetY
+                }
+                LayoutParams.ANCHOR_OVER -> {
 
+                }
+            }
+            measureChild(childAt,lWidthMeasureSpec,lHeightMeasureSpec)
         }
 
 
