@@ -29,7 +29,7 @@ import org.daimhim.guideview.view.MaskView;
  * Created by binIoter
  */
 
-public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListener {
+public abstract class AbsGuide implements View.OnKeyListener{
 
     AbsGuide() {
 
@@ -132,7 +132,12 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
      * @param pViewGroup
      */
     protected void onBindView(ViewGroup pViewGroup){
-
+        if (mConfiguration.getMOutsideTouchable()) {
+            mContentView.setClickable(false);
+        } else {
+            mContentView.setOnTouchListener(new AbsGuideTouchListener(mConfiguration,mHighlightAreas));
+        }
+        mContentView.setOnKeyListener(this);
     }
 
     private MaskView onCreateView(Context context, ViewGroup overlay) {
@@ -140,19 +145,10 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
         Rect rect = new Rect();
         overlay.getWindowVisibleDisplayFrame(rect);
         maskView.getMOverlayRect().set(rect);
-        maskView.setFocusableInTouchMode(true);
-        maskView.setFocusable(true);
-        maskView.requestFocus();
         maskView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-        maskView.setOnKeyListener(this);
         maskView.setMTargetRects(mHighlightAreas);
         maskView.setFullingColor(context.getResources().getColor(mConfiguration.getMFullingColorId()));
         maskView.setFullingAlpha(mConfiguration.getMAlpha());
-        if (mConfiguration.getMOutsideTouchable()) {
-            maskView.setClickable(false);
-        } else {
-            maskView.setOnTouchListener(this);
-        }
         // Adds the components to the mask view.
         for (Component c : mComponents) {
            maskView.addView(Common.componentToView(LayoutInflater.from(context), c));
@@ -186,73 +182,63 @@ public abstract class AbsGuide implements View.OnKeyListener, View.OnTouchListen
         }
         return false;
     }
+    static class AbsGuideTouchListener implements View.OnTouchListener{
+        private Configuration mConfiguration;
+        private SparseArray<HighlightArea> mHighlightAreas;
 
-    float startY = -1f;
-
-    @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-        Log.i("onTouch",motionEvent.toString());
-        //默认拦截
-        boolean result = true;
-        //焦点之外都可以点击
-        if (mConfiguration.getMOutsideTouchable()){
-            result = false;
+        public AbsGuideTouchListener(Configuration mConfiguration, SparseArray<HighlightArea> mHighlightAreas) {
+            this.mConfiguration = mConfiguration;
+            this.mHighlightAreas = mHighlightAreas;
         }
-        //仅处理焦点
-        if (mConfiguration.getFocusClick() && !mConfiguration.getMOutsideTouchable()){
-            //DOWN 事件，寻找处理的View
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                View currentView = null;
-                //遍历所有的允许处理事件的View 是否处理
-                for (int i = 0; i < mHighlightAreas.size(); i++) {
-                    if (!mHighlightAreas.valueAt(i).isEnable()){
-                        continue;
-                    }
-                    currentView = mHighlightAreas.valueAt(i).getView();
-                    //判断当前触摸是否在View之内
-                    if (isTouchPointInView(currentView, motionEvent.getRawX(), motionEvent.getRawY())) {
-                        result = false;
-                        break;
+
+        @Override
+        public boolean onTouch(View v, MotionEvent motionEvent) {
+            Log.i("onTouch",motionEvent.toString());
+            //默认拦截
+            boolean result = true;
+            //焦点之外都可以点击
+            if (mConfiguration.getMOutsideTouchable()){
+                result = false;
+            }
+            //仅处理焦点
+            if (mConfiguration.getFocusClick() && !mConfiguration.getMOutsideTouchable()){
+                //DOWN 事件，寻找处理的View
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    View currentView = null;
+                    //遍历所有的允许处理事件的View 是否处理
+                    for (int i = 0; i < mHighlightAreas.size(); i++) {
+                        if (!mHighlightAreas.valueAt(i).isEnable()){
+                            continue;
+                        }
+                        currentView = mHighlightAreas.valueAt(i).getView();
+                        //判断当前触摸是否在View之内
+                        if (isTouchPointInView(currentView, motionEvent.getRawX(), motionEvent.getRawY())) {
+                            result = false;
+                            break;
+                        }
                     }
                 }
             }
+            return result;
         }
-        return result;
 
-//        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-//            startY = motionEvent.getY();
-//        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-//            if (startY - motionEvent.getY() > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
-//                if (mOnSlideListener != null) {
-//                    mOnSlideListener.onSlideListener(GuideBuilder.SlideState.UP);
-//                }
-//            } else if (motionEvent.getY() - startY > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
-//                if (mOnSlideListener != null) {
-//                    mOnSlideListener.onSlideListener(GuideBuilder.SlideState.DOWN);
-//                }
-//            }
-//            if (mConfiguration != null && mConfiguration.getMAutoDismiss()) {
-//                dismiss();
-//            }
-//        }
-//        return true;
-    }
 
-    private boolean isTouchPointInView(View targetView, float xAxis, float yAxis) {
-        if (targetView== null) {
+        private boolean isTouchPointInView(View targetView, float xAxis, float yAxis) {
+            if (targetView== null) {
+                return false;
+            }
+            int[] location = new int[2];
+            targetView.getLocationOnScreen(location);
+            int left = location[0];
+            int top = location[1];
+            int right = left + targetView.getMeasuredWidth();
+            int bottom = top + targetView.getMeasuredHeight();
+            if (yAxis >= top && yAxis <= bottom && xAxis >= left
+                    && xAxis <= right) {
+                return true;
+            }
             return false;
         }
-        int[] location = new int[2];
-        targetView.getLocationOnScreen(location);
-        int left = location[0];
-        int top = location[1];
-        int right = left + targetView.getMeasuredWidth();
-        int bottom = top + targetView.getMeasuredHeight();
-        if (yAxis >= top && yAxis <= bottom && xAxis >= left
-                && xAxis <= right) {
-            return true;
-        }
-        return false;
     }
 
     /**

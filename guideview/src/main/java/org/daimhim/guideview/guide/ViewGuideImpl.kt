@@ -12,6 +12,13 @@ import android.view.animation.AnimationUtils
  * @remark: 这个人很懒，什么都没有留下
  */
 class ViewGuideImpl : AbsGuide() {
+    override fun onCreateView(context: Context?, window: Window?, overlay: ViewGroup?): ViewGroup {
+        val onCreateView = super.onCreateView(context, window, overlay)
+        onCreateView.setFocusableInTouchMode(true)
+        onCreateView.setFocusable(true)
+        onCreateView.requestFocus()
+        return onCreateView
+    }
     override fun show(context: Context, window: Window, overlay: ViewGroup) {
         super.show(context, window, overlay)
         if (contentView.parent == null) {

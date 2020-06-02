@@ -1,14 +1,10 @@
 package org.daimhim.guideview.guide
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.util.DisplayMetrics
-import android.util.Log
 import android.view.*
-import org.daimhim.guideview.util.DimenUtil
 import org.daimhim.guideview.view.GuideLayout
 
 class GuideLayoutGuideImpl : AbsGuide() {

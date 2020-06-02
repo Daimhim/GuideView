@@ -60,9 +60,8 @@ public class SimpleGuideViewActivity extends AppCompatActivity {
     builder.addTargetView(header_imgbtn,20,0)
             .setOutsideTouchable(false)
             .focusClick(true)
-            .setCancelable(false)
-            .setFullingLayoutId(R.layout.test_guide_layout_activity)
-            .setShowMode(MaskView.GUIDE_LAYOUT_SHOW)
+            .setCancelable(true)
+            .setShowMode(MaskView.DIALOG_SHOW)
             .setAlpha(150);
     builder.setOnCancelListener(new GuideBuilder.OnCancelListener() {
       @Override
