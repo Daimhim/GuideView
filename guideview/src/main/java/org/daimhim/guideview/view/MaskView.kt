@@ -5,14 +5,11 @@ import android.graphics.*
 import android.os.Build
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
-import android.util.Log
 import android.util.SparseArray
 import android.view.Gravity
-import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import org.daimhim.guideview.util.Common
-import java.lang.NullPointerException
 
 class MaskView
     : ViewGroup {
@@ -68,24 +65,71 @@ class MaskView
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val w = MeasureSpec.getSize(widthMeasureSpec)
-        var h = MeasureSpec.getSize(heightMeasureSpec)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            h += getStatusHeight()
-        }
-        setMeasuredDimension(w, h)
-        var childAt : View
-        for (index in 0 until childCount){
-            childAt = getChildAt(index)
-            measureChild(childAt,widthMeasureSpec,heightMeasureSpec)
-        }
+
         var valueAt: HighlightArea
         for (i in 0 until mTargetRects.size()) {
             valueAt = mTargetRects.valueAt(i)
             valueAt.rect.set(Common.getViewAbsRect(valueAt.view, mOverlayRect.left.toInt(), mOverlayRect.top.toInt()))
         }
+        val defaultWidthSize = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
+        val defaultHeightSize = View.getDefaultSize(suggestedMinimumHeight, heightMeasureSpec)
+        var childAt : View
+        var lp : LayoutParams
+        var childTop = 0
+        var childLeft = 0
+        for (index in 0 until childCount){
+            childAt = getChildAt(index)
+            layoutParams = childAt.layoutParams as LayoutParams
+            if (lp.id != -1){
+                valueAt = mTargetRects.get(lp.id)
+            }
+            //垂直
+            if (lp.targetAnchor == LayoutParams.ANCHOR_LEFT
+                    || lp.targetAnchor == LayoutParams.ANCHOR_RIGHT){
+                when (lp.targetParentPosition) {
+                    LayoutParams.PARENT_START -> {
+                        childTop = temRectF.top + lp.offsetY
+                    }
+                    LayoutParams.PARENT_CENTER -> {
+                        childTop = temRectF.bottom - (temRectF.height()/2)  - (height/2) + lp.offsetY
+                    }
+                    LayoutParams.PARENT_END -> {
+                        childTop = (temRectF.bottom - height) + lp.offsetY
+                    }
+                }
+
+            }else if (lp.targetAnchor == LayoutParams.ANCHOR_TOP
+                    || lp.targetAnchor == LayoutParams.ANCHOR_BOTTOM){
+                //水平
+                when (lp.targetParentPosition) {
+                    LayoutParams.PARENT_START -> {
+                        childLeft = temRectF.left + lp.offsetX
+                    }
+                    LayoutParams.PARENT_CENTER -> {
+                        childLeft = temRectF.right - (temRectF.width()/2)  - (width/2) + lp.offsetX
+                    }
+                    LayoutParams.PARENT_END -> {
+                        childLeft = temRectF.right + lp.offsetX
+                    }
+                }
+            }
+            measureChild(childAt,widthMeasureSpec,heightMeasureSpec)
+            MeasureSpec.makeMeasureSpec()
+
+        }
+
+
+        setMeasuredDimension(defaultWidthSize,
+                defaultHeightSize)
     }
+
+    /**
+     * 获取子View可以占据的最大宽高
+     */
+    fun measureChildMaxWidthAndHeight(layoutParams : LayoutParams){
+
+    }
+
 
     override fun onLayout(changed: Boolean,left:Int, top:Int, right:Int, bottom:Int) {
         var childAt : View
@@ -201,6 +245,9 @@ class MaskView
         return LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
+    override fun generateLayoutParams(attrs: AttributeSet?): ViewGroup.LayoutParams {
+        return LayoutParams(context,attrs)
+    }
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         try {
