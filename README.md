@@ -1,3 +1,22 @@
+* <h1>版本更新</h1>
++ <h5>1.0.2</h5>
+1. 增加返回键的可控，新增Cancelable属性和监听
+2. mOutsideTouchable属性可以控制所有蒙层是否可以被点击
+3. focusClick 仅焦点可以被点击 最好和mOutsideTouchable结合使用
++ <h5>1.0.1</h5>
+1. 修改了部分BUG
++ <h5>1.0.0</h5>
+1. 加入kotlin
+2. 扩展了蒙层子View功能
+3. 重写了MaskView的绘制，测量，布局
+4. 优化了布局绘制
+5. 新增 支持仅高亮处可以处理触摸事件
+6. 新增 可以屏蔽指定高亮处的触摸事件
+7. 项目已经迁移到androidx
+8. 调整了项目架构，增加了工厂模式来创建展示模式和绘制形状
+9. 增加了以View插入Wind、Dialog、DialogFragmeng三种方式添加蒙层
+10. 新增多高亮支持
+
  * <h1>GuideView</h1>
  * 本系统能够快速的为一个Activity里的任何一个View控件创建一个遮罩式的导航页，并且可以再高亮区域绘制任何你想要的布局或者lottie动画等炫酷效果</p>
  * <h3>工作原理</h3>
@@ -8,7 +27,7 @@
  * <h3>使用方法</h3>
  *  <h4>1.添加gradle依赖</h4>
  
-        implementation 'com.binioter:guideview:1.0.0'
+        implementation 'org.daimhim.guideview:guideview:1.0'
         
  *  <h4>2.编写用于在高亮区域周围展示的component</h4>
  *  
