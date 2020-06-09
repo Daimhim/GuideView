@@ -66,84 +66,20 @@ class MaskView
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val w = MeasureSpec.getSize(widthMeasureSpec)
+        val h = MeasureSpec.getSize(heightMeasureSpec)
+        setMeasuredDimension(w, h)
+        var childAt : View
+        for (index in 0 until childCount){
+            childAt = getChildAt(index)
+            measureChild(childAt,widthMeasureSpec,heightMeasureSpec)
+        }
         var valueAt: HighlightArea
         for (i in 0 until mTargetRects.size()) {
             valueAt = mTargetRects.valueAt(i)
             valueAt.rect.set(Common.getViewAbsRect(valueAt.view, mOverlayRect.left.toInt(), mOverlayRect.top.toInt()))
         }
-        val defaultWidthSize = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
-        val defaultHeightSize = View.getDefaultSize(suggestedMinimumHeight, heightMeasureSpec)
-        var childAt : View
-        var lp : LayoutParams = generateDefaultLayoutParams()
-        var childTop = 0F
-        var childLeft = 0F
-        var lWidthMeasureSpec = 0
-        var lHeightMeasureSpec = 0
-        for (index in 0 until childCount){
-            childAt = getChildAt(index)
-            layoutParams = childAt.layoutParams as LayoutParams
-            if (lp.id != -1){
-                temRectF.set(mTargetRects.get(lp.id).rect)
-            }else{
-                temRectF.set(mOverlayRect)
-            }
-            measureChild(childAt,widthMeasureSpec,heightMeasureSpec)
-            //垂直
-            if (lp.targetAnchor == LayoutParams.ANCHOR_LEFT
-                    || lp.targetAnchor == LayoutParams.ANCHOR_RIGHT){
-                when (lp.targetParentPosition) {
-                    LayoutParams.PARENT_START -> {
-                        childTop = temRectF.top + lp.offsetY
-                        lHeightMeasureSpec = MeasureSpec.makeMeasureSpec((defaultHeightSize-childTop).toInt(),MeasureSpec.AT_MOST)
-                    }
-                    LayoutParams.PARENT_CENTER -> {
-                        childTop = temRectF.bottom - (temRectF.height()/2)  - (height/2) + lp.offsetY
-                    }
-                    LayoutParams.PARENT_END -> {
-                        childTop = (temRectF.bottom - height) + lp.offsetY
-                    }
-                }
-
-            }else if (lp.targetAnchor == LayoutParams.ANCHOR_TOP
-                    || lp.targetAnchor == LayoutParams.ANCHOR_BOTTOM){
-                //水平
-                when (lp.targetParentPosition) {
-                    LayoutParams.PARENT_START -> {
-                        childLeft = temRectF.left + lp.offsetX
-                    }
-                    LayoutParams.PARENT_CENTER -> {
-                        childLeft = temRectF.right - (temRectF.width()/2)  - (width/2) + lp.offsetX
-                    }
-                    LayoutParams.PARENT_END -> {
-                        childLeft = temRectF.right + lp.offsetX
-                    }
-                }
-            }
-            //垂直
-            when(lp.targetAnchor) {
-                LayoutParams.ANCHOR_LEFT -> {
-                    childLeft = (temRectF.left - width) + lp.offsetX
-                }
-                LayoutParams.ANCHOR_RIGHT -> {
-                    childLeft = (temRectF.right) + lp.offsetX
-                }
-                LayoutParams.ANCHOR_TOP -> {
-                    childTop = (temRectF.top - height) + lp.offsetY
-                }
-                LayoutParams.ANCHOR_BOTTOM -> {
-                    childTop = (temRectF.bottom) + lp.offsetY
-                }
-                LayoutParams.ANCHOR_OVER -> {
-
-                }
-            }
-            measureChild(childAt,lWidthMeasureSpec,lHeightMeasureSpec)
-        }
-
-
-        setMeasuredDimension(defaultWidthSize,
-                defaultHeightSize)
     }
 
     /**
@@ -318,6 +254,7 @@ class MaskView
         /**
          * 以普通View展示
          */
+        @Deprecated("已过时")
         const val VIEW_SHOW = 0x01
         /**
          * 以Dialog展示

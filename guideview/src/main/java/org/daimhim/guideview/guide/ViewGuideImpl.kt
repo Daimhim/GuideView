@@ -11,6 +11,7 @@ import android.view.animation.AnimationUtils
  * @author: Zhangx
  * @remark: 这个人很懒，什么都没有留下
  */
+@Deprecated("已过时")
 class ViewGuideImpl : AbsGuide() {
     override fun onCreateView(context: Context?, window: Window?, overlay: ViewGroup?): ViewGroup {
         val onCreateView = super.onCreateView(context, window, overlay)
