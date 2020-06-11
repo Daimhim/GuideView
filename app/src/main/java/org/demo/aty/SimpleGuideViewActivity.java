@@ -58,9 +58,9 @@ public class SimpleGuideViewActivity extends AppCompatActivity {
   public void showGuideView() {
     GuideBuilder builder = new GuideBuilder();
     builder.addTargetView(header_imgbtn,20,0)
-            .setOutsideTouchable(false)
-            .focusClick(true)
-            .setCancelable(true)
+            .setOutsideTouchable(true)
+            .focusClick(false)
+            .setCancelable(false)
             .setShowMode(MaskView.DIALOG_SHOW)
             .setAlpha(150);
     builder.setOnCancelListener(new GuideBuilder.OnCancelListener() {

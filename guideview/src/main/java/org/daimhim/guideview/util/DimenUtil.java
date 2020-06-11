@@ -1,6 +1,7 @@
 package org.daimhim.guideview.util;
 
 import android.content.Context;
+import android.view.View;
 
 /**
  * Created by binIoter
@@ -39,6 +40,23 @@ public class DimenUtil {
             result = context.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    public static boolean isTouchPointInView(View targetView, float xAxis, float yAxis) {
+        if (targetView== null) {
+            return false;
+        }
+        int[] location = new int[2];
+        targetView.getLocationOnScreen(location);
+        int left = location[0];
+        int top = location[1];
+        int right = left + targetView.getMeasuredWidth();
+        int bottom = top + targetView.getMeasuredHeight();
+        if (yAxis >= top && yAxis <= bottom && xAxis >= left
+                && xAxis <= right) {
+            return true;
+        }
+        return false;
     }
 
 }

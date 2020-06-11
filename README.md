@@ -1,4 +1,8 @@
 * <h1>版本更新</h1>
++ <h5>1.0.7</h5>
+1. 增加了DialogLayout
+2. 优化了原有的DialogGuide
+3. 解决了个别机型系统栏白边
 + <h5>1.0.2</h5>
 1. 增加返回键的可控，新增Cancelable属性和监听
 2. mOutsideTouchable属性可以控制所有蒙层是否可以被点击

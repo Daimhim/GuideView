@@ -1,5 +1,7 @@
 package org.daimhim.guideview.guide
 
+import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.view.ViewGroup
 import android.view.Window
@@ -13,6 +15,13 @@ import android.view.animation.AnimationUtils
  */
 @Deprecated("已过时")
 class ViewGuideImpl : AbsGuide() {
+    override fun show(activity: Activity) {
+        show(activity,activity.findViewById(android.R.id.content))
+    }
+
+    override fun show(dialog: Dialog) {
+        show(dialog.context,dialog.window,(dialog.window!!.decorView as ViewGroup))
+    }
     override fun onCreateView(context: Context?, window: Window?, overlay: ViewGroup?): ViewGroup {
         val onCreateView = super.onCreateView(context, window, overlay)
         onCreateView.setFocusableInTouchMode(true)

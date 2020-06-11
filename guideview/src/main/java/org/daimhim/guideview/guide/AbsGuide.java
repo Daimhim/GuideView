@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 
 import org.daimhim.guideview.util.Common;
+import org.daimhim.guideview.util.DimenUtil;
 import org.daimhim.guideview.view.Component;
 import org.daimhim.guideview.Configuration;
 import org.daimhim.guideview.GuideBuilder;
@@ -144,6 +145,7 @@ public abstract class AbsGuide implements View.OnKeyListener{
         MaskView maskView = new MaskView(context);
         Rect rect = new Rect();
         overlay.getWindowVisibleDisplayFrame(rect);
+        rect.top = 0;
         maskView.getMOverlayRect().set(rect);
         maskView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         maskView.setMTargetRects(mHighlightAreas);
@@ -212,7 +214,7 @@ public abstract class AbsGuide implements View.OnKeyListener{
                         }
                         currentView = mHighlightAreas.valueAt(i).getView();
                         //判断当前触摸是否在View之内
-                        if (isTouchPointInView(currentView, motionEvent.getRawX(), motionEvent.getRawY())) {
+                        if (DimenUtil.isTouchPointInView(currentView, motionEvent.getRawX(), motionEvent.getRawY())) {
                             result = false;
                             break;
                         }
@@ -223,22 +225,7 @@ public abstract class AbsGuide implements View.OnKeyListener{
         }
 
 
-        private boolean isTouchPointInView(View targetView, float xAxis, float yAxis) {
-            if (targetView== null) {
-                return false;
-            }
-            int[] location = new int[2];
-            targetView.getLocationOnScreen(location);
-            int left = location[0];
-            int top = location[1];
-            int right = left + targetView.getMeasuredWidth();
-            int bottom = top + targetView.getMeasuredHeight();
-            if (yAxis >= top && yAxis <= bottom && xAxis >= left
-                    && xAxis <= right) {
-                return true;
-            }
-            return false;
-        }
+
     }
 
     /**
